@@ -6,6 +6,8 @@ class Group {
     // Массив агентов
     val agents = arrayListOf<Agent>()
 
+    var isActiveGroup = true
+
     // Добавить агента
     fun addAgent(agent: Agent) {
         agents.add(agent)

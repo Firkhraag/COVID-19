@@ -28,88 +28,88 @@ class Parameters : View("Параметры") {
         progressBar.styleClass.add("progress")
 
         vbox {
-//            hbox {
-//                vbox {
-//                    label("Коэффициент продолжительности")
-//                    textfield().apply {
-//                        disableProperty().bind(controller.started)
-//                        textProperty().bindBidirectional(controller.durationCoefficientTextField)
-//                    }
-//                }.apply {
-//                    alignment = Pos.CENTER
-//                    spacing = 5.0
-//                }
-//
-//                vbox {
-//                    label("Коэффициент восприимчивости")
-//                    textfield().apply {
-//                        disableProperty().bind(controller.started)
-//                        textProperty().bindBidirectional(controller.susceptibilityLowestInfluenceTextField)
-//                    }
-//                }.apply {
-//                    managedProperty().bind(visibleProperty())
-//                    alignment = Pos.CENTER
-//                    spacing = 5.0
-//                }
-//
-//                vbox {
-//                    label("Коэффициент продолжительности2")
-//                    textfield().apply {
-//                        disableProperty().bind(controller.started)
-//                        textProperty().bindBidirectional(controller.durationCoefficientTextField)
-//                    }
-//                }.apply {
-//                    alignment = Pos.CENTER
-//                    spacing = 5.0
-//                }
-//            }.apply {
-//                managedProperty().bind(visibleProperty())
-//                alignment = Pos.CENTER
-//                spacing = 50.0
-//            }
-//
-//            vbox {
-//                label("Начальная доля больных")
-//                textfield().apply {
-//                    disableProperty().bind(controller.started)
-//                    textProperty().bindBidirectional(controller.startingRatioTextField)
-//                }
-//            }.apply {
-//                managedProperty().bind(visibleProperty())
-//                alignment = Pos.CENTER
-//                spacing = 5.0
-//            }
-//
-//            hbox {
-//                vbox {
-//                    label("Инкубационный период, дней")
-//                    textfield().apply {
-//                        disableProperty().bind(controller.started)
-//                        textProperty().bindBidirectional(controller.incubationPeriodTextField)
-//                    }
-//                }.apply {
-//                    managedProperty().bind(visibleProperty())
-//                    alignment = Pos.CENTER
-//                    spacing = 5.0
-//                }
-//
-//                vbox {
-//                    label("Период болезни, дней")
-//                    textfield().apply {
-//                        disableProperty().bind(controller.started)
-//                        textProperty().bindBidirectional(controller.durationPeriodTextField)
-//                    }
-//                }.apply {
-//                    managedProperty().bind(visibleProperty())
-//                    alignment = Pos.CENTER
-//                    spacing = 5.0
-//                }
-//
-//            }.apply {
-//                managedProperty().bind(visibleProperty())
-//                alignment = Pos.CENTER
-//                spacing = 85.0
-//            }
+            hbox {
+                vbox {
+                    label("Коэффициент продолжительности")
+                    textfield().apply {
+                        disableProperty().bind(controller.started)
+                        textProperty().bindBidirectional(controller.durationCoefficientTextField)
+                    }
+                }.apply {
+                    alignment = Pos.CENTER
+                    spacing = 5.0
+                }
+
+                vbox {
+                    label("Коэффициент восприимчивости")
+                    textfield().apply {
+                        disableProperty().bind(controller.started)
+                        textProperty().bindBidirectional(controller.susceptibilityLowestInfluenceTextField)
+                    }
+                }.apply {
+                    managedProperty().bind(visibleProperty())
+                    alignment = Pos.CENTER
+                    spacing = 5.0
+                }
+
+                vbox {
+                    label("Коэффициент продолжительности2")
+                    textfield().apply {
+                        disableProperty().bind(controller.started)
+                        textProperty().bindBidirectional(controller.durationCoefficientTextField)
+                    }
+                }.apply {
+                    alignment = Pos.CENTER
+                    spacing = 5.0
+                }
+            }.apply {
+                managedProperty().bind(visibleProperty())
+                alignment = Pos.CENTER
+                spacing = 50.0
+            }
+
+            vbox {
+                label("Начальная доля больных")
+                textfield().apply {
+                    disableProperty().bind(controller.started)
+                    textProperty().bindBidirectional(controller.startingRatioTextField)
+                }
+            }.apply {
+                managedProperty().bind(visibleProperty())
+                alignment = Pos.CENTER
+                spacing = 5.0
+            }
+
+            hbox {
+                vbox {
+                    label("Инкубационный период, дней")
+                    textfield().apply {
+                        disableProperty().bind(controller.started)
+                        textProperty().bindBidirectional(controller.incubationPeriodTextField)
+                    }
+                }.apply {
+                    managedProperty().bind(visibleProperty())
+                    alignment = Pos.CENTER
+                    spacing = 5.0
+                }
+
+                vbox {
+                    label("Период болезни, дней")
+                    textfield().apply {
+                        disableProperty().bind(controller.started)
+                        textProperty().bindBidirectional(controller.durationPeriodTextField)
+                    }
+                }.apply {
+                    managedProperty().bind(visibleProperty())
+                    alignment = Pos.CENTER
+                    spacing = 5.0
+                }
+
+            }.apply {
+                managedProperty().bind(visibleProperty())
+                alignment = Pos.CENTER
+                spacing = 85.0
+            }
 
             button(buttonText).apply {
                 disableProperty().bind(controller.started)

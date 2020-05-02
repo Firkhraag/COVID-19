@@ -7,7 +7,7 @@ class Workplace {
     // Минимальный размер фирмы
     private val minFirmSize = 6
     // Максимальный размер фирмы
-    private val maxFirmSize = 2500
+    private val maxFirmSize = 2500 - minFirmSize
 
     // Создание графа Барабаши-Альберта для последней добавленной компании
     fun generateLastBarabasiAlbertNetwork() {
@@ -22,7 +22,7 @@ class Workplace {
     }
 
     // Распределение по закону Ципфа
-    private val zipfDistribution = org.apache.commons.math3.distribution.ZipfDistribution(maxFirmSize, 1.0)
+    private val zipfDistribution = org.apache.commons.math3.distribution.ZipfDistribution(maxFirmSize, 1.059)
     // Размер последней добавленной компании
     private var currentGroupSize = zipfDistribution.sample() + (minFirmSize - 1)
 

@@ -3,6 +3,7 @@ package application.model
 import application.utility.writeTableInt
 import kotlinx.coroutines.*
 import application.utility.readTableDouble
+import application.utility.readTableInt
 import javafx.application.Platform
 import javafx.beans.property.ReadOnlyDoubleWrapper
 import javafx.beans.property.SimpleStringProperty
@@ -24,9 +25,9 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
 
     // Общее число случаев, Число активных больных, Число новых случаев, Число смертей
     // Зарегистрированные
-    private var stats = arrayListOf(0, 0, 0, 0)
-    // Все
-    private var statsAll = arrayListOf(0, 0, 0, 0)
+    private var stats = arrayListOf(0, 0, 0, 0, 0)
+    // Данные по заболеваемости, выздоровлению, смертности
+    private val realData = arrayListOf(arrayListOf<Int>())
 
 //    val infectedNumbers = arrayListOf(125, 147, 156, 171, 191, 226, 295, 329, 373, 408, 488, 557,
 //        678, 799, 929, 1083, 98)
@@ -67,10 +68,17 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
     private val householdsWith34People2ChildrenPercentage = 69
 
     // Продолжительности контактов в домохозяйстве
-    private fun getHouseholdContactDuration(): Double {
+    private fun getFullHouseholdContactDuration(): Double {
         // Normal distribution (mean = 12.4, SD = 5.13)
         val rand = java.util.Random()
         return min(24.0, max(0.0,12.4 + rand.nextGaussian() * 5.13))
+    }
+
+    private fun getHouseholdContactDuration(): Double {
+        // Normal distribution (mean = 8.0, SD = 3.28)
+        val rand = java.util.Random()
+//        return min(24.0, max(0.0,12.4 + rand.nextGaussian() * 5.13))
+        return min(24.0, max(0.0,8.0 + rand.nextGaussian() * 3.28))
     }
 
     // Продолжительности контактов на работе
@@ -247,13 +255,14 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
     @Synchronized private fun addAgentsToGroups(agents: ArrayList<Agent>, household: Household) {
         agents.forEach { agent ->
             // Добавление в рабочий коллектив
-            if (agent.isGoingToWork) {
+            if (agent.hasWork) {
                 workplace.addAgent(agent)
             }
+//            if (agent.isGoingToWork) {
+//                workplace.addAgent(agent)
+//            }
             if (agent.healthStatus == 1) {
                 agent.updateHealthParameters(0.05)
-                statsAll[0] += 1
-                statsAll[1] += 1
             }
             // Добавление в домохозяйство
             household.addAgent(agent)
@@ -536,21 +545,26 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
     // Симуляция
     fun runSimulation(numOfIter: Int, durationBias: Double, series1: XYChart.Series<String, Number>,
                       series2: XYChart.Series<String, Number>, series3: XYChart.Series<String, Number>,
-                      series4: XYChart.Series<String, Number>, dateLabelText: SimpleStringProperty) {
-
-        // Для каждого агента находим влияние восприимчивости и наличие хронических заболеваний
-        households.parallelStream().forEach { household ->
-            household.group.agents.forEach { agent ->
-                agent.findSusceptibilityInfluence(0.8)
-                agent.findComorbidity()
-            }
-        }
+                      series4: XYChart.Series<String, Number>, series1Real: XYChart.Series<String, Number>,
+                      series2Real: XYChart.Series<String, Number>, series3Real: XYChart.Series<String, Number>,
+                      series4Real: XYChart.Series<String, Number>, dateLabelText: SimpleStringProperty) {
 
         // Цикл симуляции
         while(true) {
+
+            if (globalDay == 14) {
+                workplace.companies.parallelStream().forEach { company ->
+                    if ((0..9).random() < 7) {
+                        company.isActiveGroup = false
+                        company.agents.forEach { agent ->
+                            agent.isGoingToWork = false
+                        }
+                    }
+                }
+            }
+
             // Число новых случаев устанавливаем в 0 на новом шаге
             stats[2] = 0
-            statsAll[2] = 0
 
             // Является ли день выходным
             var isHoliday = false
@@ -634,26 +648,106 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                 }
                 // Контакты в рабочем коллективе
                 workplace.companies.parallelStream().forEach { company ->
-                    company.agents.forEach { agent ->
-                        if ((agent.healthStatus == 1) && (!agent.isIsolated))  {
-                            company.agents.forEachIndexed { index, agent2 ->
-                                if ((agent2.healthStatus == 0) &&
-                                    (index in agent.connectedWorkAgents)) {
-                                    val durationCoefficient = 1 / (1 + exp(
-                                        -getWorkplaceContactDuration() + durationBias))
-                                    val randNum = (0..9999).random() * 0.0001
-                                    val probabilityOfInfection = agent.infectivityInfluence *
-                                            agent.susceptibilityInfluence * durationCoefficient
+                    if (company.isActiveGroup) {
+                        company.agents.forEach { agent ->
+                            if ((agent.healthStatus == 1) && (!agent.isIsolated))  {
+                                company.agents.forEachIndexed { index, agent2 ->
+                                    if ((agent2.healthStatus == 0) &&
+                                        (index in agent.connectedWorkAgents)) {
+
+                                        val durationCoefficient = 1 / (1 + exp(
+                                            -getWorkplaceContactDuration() + durationBias))
+                                        val randNum = (0..9999).random() * 0.0001
+                                        val probabilityOfInfection = agent.infectivityInfluence *
+                                                agent.susceptibilityInfluence * durationCoefficient
 //                                    println("Work")
 //                                    println(probabilityOfInfection)
 //                                    readLine()
-                                    if (randNum < probabilityOfInfection) {
-                                        agent2.healthStatus = 3
+                                        if (randNum < probabilityOfInfection) {
+                                            agent2.healthStatus = 3
+                                        }
+
+//                                    if ((globalDay > 13) && ((!agent.isGoingToWork) || (!agent2.isGoingToWork))) {
+//
+//                                    } else {
+//                                        val durationCoefficient = 1 / (1 + exp(
+//                                            -getWorkplaceContactDuration() + durationBias))
+//                                        val randNum = (0..9999).random() * 0.0001
+//                                        val probabilityOfInfection = agent.infectivityInfluence *
+//                                                agent.susceptibilityInfluence * durationCoefficient
+////                                    println("Work")
+////                                    println(probabilityOfInfection)
+////                                    readLine()
+//                                        if (randNum < probabilityOfInfection) {
+//                                            agent2.healthStatus = 3
+//                                        }
+//                                    }
+
+//                                    val durationCoefficient = 1 / (1 + exp(
+//                                        -getWorkplaceContactDuration() + durationBias))
+//                                    val randNum = (0..9999).random() * 0.0001
+//                                    val probabilityOfInfection = agent.infectivityInfluence *
+//                                            agent.susceptibilityInfluence * durationCoefficient
+////                                    println("Work")
+////                                    println(probabilityOfInfection)
+////                                    readLine()
+//                                    if (randNum < probabilityOfInfection) {
+//                                        agent2.healthStatus = 3
+//                                    }
                                     }
                                 }
                             }
                         }
                     }
+//                    company.agents.forEach { agent ->
+//                        if ((agent.healthStatus == 1) && (!agent.isIsolated))  {
+//                            company.agents.forEachIndexed { index, agent2 ->
+//                                if ((agent2.healthStatus == 0) &&
+//                                    (index in agent.connectedWorkAgents)) {
+//
+//                                    val durationCoefficient = 1 / (1 + exp(
+//                                        -getWorkplaceContactDuration() + durationBias))
+//                                    val randNum = (0..9999).random() * 0.0001
+//                                    val probabilityOfInfection = agent.infectivityInfluence *
+//                                            agent.susceptibilityInfluence * durationCoefficient
+////                                    println("Work")
+////                                    println(probabilityOfInfection)
+////                                    readLine()
+//                                    if (randNum < probabilityOfInfection) {
+//                                        agent2.healthStatus = 3
+//                                    }
+//
+////                                    if ((globalDay > 13) && ((!agent.isGoingToWork) || (!agent2.isGoingToWork))) {
+////
+////                                    } else {
+////                                        val durationCoefficient = 1 / (1 + exp(
+////                                            -getWorkplaceContactDuration() + durationBias))
+////                                        val randNum = (0..9999).random() * 0.0001
+////                                        val probabilityOfInfection = agent.infectivityInfluence *
+////                                                agent.susceptibilityInfluence * durationCoefficient
+//////                                    println("Work")
+//////                                    println(probabilityOfInfection)
+//////                                    readLine()
+////                                        if (randNum < probabilityOfInfection) {
+////                                            agent2.healthStatus = 3
+////                                        }
+////                                    }
+//
+////                                    val durationCoefficient = 1 / (1 + exp(
+////                                        -getWorkplaceContactDuration() + durationBias))
+////                                    val randNum = (0..9999).random() * 0.0001
+////                                    val probabilityOfInfection = agent.infectivityInfluence *
+////                                            agent.susceptibilityInfluence * durationCoefficient
+//////                                    println("Work")
+//////                                    println(probabilityOfInfection)
+//////                                    readLine()
+////                                    if (randNum < probabilityOfInfection) {
+////                                        agent2.healthStatus = 3
+////                                    }
+//                                }
+//                            }
+//                        }
+//                    }
                 }
             }
 
@@ -663,54 +757,63 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                         // Переход в инфицированное состояние
                         3 -> {
                             agent.healthStatus = 1
-                            statsAll[2]++
                             agent.updateHealthParameters(0.05)
                         }
                         1 -> {
-                            if (agent.daysInfected == agent.shouldBeInfected) {
+                            if (agent.daysInfected == agent.infectionPeriod) {
+//                                println("Global step: ${globalDay}")
+//                                println("Days infected: ${agent.daysInfected}")
+//                                println("Infection period: ${agent.infectionPeriod}")
+//                                readLine()
                                 // Переход в иммунное состояние
-                                statsAll[1]--
-                                if (agent.isReported) {
-                                    stats[1]--
-                                }
+                                stats[1]--
+                                stats[4]++
                                 agent.healthStatus = 2
                             } else {
                                 // Самоизоляция
                                 if ((agent.daysInfected == agent.isolationPeriod) && (!agent.isAsymptomatic)) {
                                     agent.isIsolated = true
                                 }
-                                // Регистрация больного
-                                if ((agent.daysInfected == agent.reportPeriod) &&
-                                    (!agent.isAsymptomatic) &&
-                                    (!agent.isReported)) {
+                                // Выявление больного
+                                if (agent.daysInfected == agent.reportPeriod) {
                                     stats[2]++
-                                    agent.isReported = true
                                 }
-                                // Точка максимальной тяжести
-                                if ((agent.daysInfected == agent.changePoint) && (!agent.isAsymptomatic)) {
-                                    // Возможность перейти в тяжелую форму
-                                    agent.chanceToBeInCriticalCondition()
-                                    if (agent.isInCriticalCondition) {
-                                        agent.isIsolated = true
-                                        if (!agent.isReported) {
-                                            stats[2]++
-                                            agent.isReported = true
-                                        }
-                                    }
-                                } else if (agent.isInCriticalCondition) {
-                                    // Возможность умереть
-                                    if (agent.willDie()) {
-                                        agent.healthStatus = 4
-                                        stats[3]++
-                                        stats[1]--
-                                    } else {
-                                        // Выходит из тяжелой формы, если число дней проведенных в состоянии болезни
-                                        // равно 0.75 * продолжительность периода болезни
-                                        if (agent.daysInfected == (0.75 * agent.shouldBeInfected).roundToInt()) {
-                                            agent.isInCriticalCondition = false
-                                        }
-                                    }
+                                if ((agent.daysInfected == agent.dayOfDeath) && (agent.willDie)) {
+                                    agent.healthStatus = 4
+                                    stats[3]++
+                                    stats[1]--
                                 }
+//                                if ((agent.daysInfected == agent.reportPeriod) &&
+//                                    (!agent.isAsymptomatic) &&
+//                                    (!agent.isReported)) {
+//                                    stats[2]++
+//                                    agent.isReported = true
+//                                }
+//                                // Точка максимальной тяжести
+//                                if ((agent.daysInfected == agent.changePoint) && (!agent.isAsymptomatic)) {
+//                                    // Возможность перейти в тяжелую форму
+//                                    agent.chanceToBeInCriticalCondition()
+//                                    if (agent.isInCriticalCondition) {
+//                                        agent.isIsolated = true
+//                                        if (!agent.isReported) {
+//                                            stats[2]++
+//                                            agent.isReported = true
+//                                        }
+//                                    }
+//                                } else if (agent.isInCriticalCondition) {
+//                                    // Возможность умереть
+//                                    if (agent.willDie()) {
+//                                        agent.healthStatus = 4
+//                                        stats[3]++
+//                                        stats[1]--
+//                                    } else {
+//                                        // Выходит из тяжелой формы, если число дней проведенных в состоянии болезни
+//                                        // равно 0.75 * продолжительность периода болезни
+//                                        if (agent.daysInfected == (0.75 * agent.shouldBeInfected).roundToInt()) {
+//                                            agent.isInCriticalCondition = false
+//                                        }
+//                                    }
+//                                }
                                 // Переход на новый день болезни
                                 agent.daysInfected += 1
                                 // Обновление влияния силы инфекции
@@ -724,8 +827,6 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
             // Прибавляем к числу общих и активных случаев число новых случаев за день
             stats[0] += stats[2]
             stats[1] += stats[2]
-            statsAll[0] += statsAll[2]
-            statsAll[1] += statsAll[2]
 
             // Название месяца для UI
             val monthName = when (month) {
@@ -744,10 +845,17 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
             }
             // Обновление UI
             Platform.runLater {
-                series1.data.add(XYChart.Data<String, Number>(globalDay.toString(), stats[0]))
-                series2.data.add(XYChart.Data<String, Number>(globalDay.toString(), stats[1]))
-                series3.data.add(XYChart.Data<String, Number>(globalDay.toString(), stats[2]))
-                series4.data.add(XYChart.Data<String, Number>(globalDay.toString(), stats[3]))
+                series1.data.add(XYChart.Data<String, Number>("$day $monthName", stats[0]))
+                series2.data.add(XYChart.Data<String, Number>("$day $monthName", stats[1]))
+                series3.data.add(XYChart.Data<String, Number>("$day $monthName", stats[2]))
+                series4.data.add(XYChart.Data<String, Number>("$day $monthName", stats[3]))
+
+                if (globalDay < 46) {
+                    series1Real.data.add(XYChart.Data<String, Number>("$day $monthName", realData[globalDay][6]))
+//                    series2Real.data.add(XYChart.Data<String, Number>(globalDay.toString(), realData[globalDay][3]))
+                    series3Real.data.add(XYChart.Data<String, Number>("$day $monthName", realData[globalDay][5]))
+                    series4Real.data.add(XYChart.Data<String, Number>("$day $monthName", realData[globalDay][2]))
+                }
                 dateLabelText.set("$day $monthName")
             }
 
@@ -765,7 +873,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
 //            if ((month == 8) && (day == 32)) {
 //                break
 //            }
-            if ((month == 4) && (day == 24)) {
+            if ((month == 7) && (day == 2)) {
                 break
             }
             // Меняем день недели
@@ -797,6 +905,10 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
         val districtsAgeSexRatioMatrix = arrayListOf<ArrayList<Double>>()
         readTableDouble("D:\\Dev\\Projects\\KotlinProjects\\TornadoFXCOVID\\src\\tables\\districts_ratio_cumulative.xlsx",
                 21, 54, districtsAgeSexRatioMatrix)
+
+        readTableInt("D:\\Dev\\Projects\\KotlinProjects\\TornadoFXCOVID\\src\\tables\\stats.xlsx",
+            46, 7, realData)
+
         println("Creating households...")
         addHouseholdsToPool(districtsAgeSexRatioMatrix)
     }

@@ -1,7 +1,9 @@
 package application.view
 
 import application.controller.MyController
-import javafx.scene.control.*
+import javafx.geometry.Insets
+import javafx.scene.control.Label
+import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
 import javafx.stage.Screen
 import tornadofx.*
@@ -22,8 +24,24 @@ class MainView : View("Агентная модель COVID-19") {
         dateLabel.textProperty().bind(controller.dateLabelText)
         dateLabel.styleClass.add("date-label")
 
-        top = stackpane {
-            add(dateLabel)
+//        top = stackpane {
+//            add(dateLabel)
+//            label("Данные")
+//            label("Модель")
+//        }
+        top = borderpane {
+            center = dateLabel
+            right = hbox {
+                label("• Данные").apply {
+                    styleClass.add("data-label")
+                }
+                label("• Модель").apply {
+                    styleClass.add("model-label")
+                }
+            }.apply {
+                spacing = 20.0
+                padding = Insets(0.0, 20.0, 0.0, 0.0)
+            }
         }
         center = tabpane {
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE

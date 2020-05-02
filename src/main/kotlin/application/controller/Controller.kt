@@ -24,6 +24,11 @@ open class MyController : Controller() {
     val series3 = XYChart.Series<String, Number>()
     val series4 = XYChart.Series<String, Number>()
 
+    val series1Real = XYChart.Series<String, Number>()
+    val series2Real = XYChart.Series<String, Number>()
+    val series3Real = XYChart.Series<String, Number>()
+    val series4Real = XYChart.Series<String, Number>()
+
     val series1All = XYChart.Series<String, Number>()
     val series2All = XYChart.Series<String, Number>()
     val series3All = XYChart.Series<String, Number>()
@@ -51,7 +56,8 @@ open class MyController : Controller() {
         for (numOfIter in (1..1)) {
             world.runSimulation(
                 numOfIter, durationCoefficientTextField.get().toDouble(),
-                series1, series2, series3, series4, dateLabelText
+                series1, series2, series3, series4, series1Real,
+                series2Real, series3Real, series4Real, dateLabelText
             )
         }
     }

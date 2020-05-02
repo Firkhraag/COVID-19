@@ -1214,12 +1214,11 @@ TABPANE
 
 .date-label {
     -fx-font-size: 24;
-    -fx-text-fill: rgb(94.0, 203.0, 234.0);
 }
 
 .progress {
-    -fx-min-width: 500;
-    -fx-max-width: 500;
+    -fx-min-width: 400;
+    -fx-max-width: 400;
 }
 
 .graph1, .graph2, .graph3, .graph4 {
@@ -1229,14 +1228,36 @@ TABPANE
     -fx-max-width: 600;
 }
 
-.graph1 .default-color0.chart-series-area-line { -fx-stroke: rgb(94.0, 203.0, 234.0); }
-.graph1 .default-color0.chart-series-area-fill { -fx-fill: rgb(94.0, 203.0, 234.0, 0.5); }
-.graph1 .default-color0.chart-area-symbol { -fx-background-color: rgb(94.0, 203.0, 234.0), white; }
+.graph1 .series0.chart-series-line { -fx-stroke: rgb(94.0, 203.0, 234.0); }
+.graph1 .series0.chart-line-symbol { -fx-background-color: rgb(94.0, 203.0, 234.0), white; }
 
-.graph2 .default-color0.chart-series-area-line { -fx-stroke: rgb(0.0, 221.0, 221.0); }
-.graph2 .default-color0.chart-series-area-fill { -fx-fill: rgb(0.0, 221.0, 221.0, 0.3); }
-.graph2 .default-color0.chart-area-symbol { -fx-background-color: rgb(0.0, 221.0, 221.0), white; }
+.graph1 .series1.chart-series-line { -fx-stroke: rgb(243.0, 98.0, 45.0); }
+.graph1 .series1.chart-line-symbol { -fx-background-color: rgb(243.0, 98.0, 45.0), white; }
 
-.graph4 .default-color0.chart-series-area-line { -fx-stroke: rgb(255.0, 153.0, 0.0); }
-.graph4 .default-color0.chart-series-area-fill { -fx-fill: rgb(255.0, 153.0, 0.0, 0.3); }
-.graph4 .default-color0.chart-area-symbol { -fx-background-color: rgb(255.0, 153.0, 0.0), white; }
+.graph2 .series0.chart-series-line { -fx-stroke: rgb(94.0, 203.0, 234.0); }
+.graph2 .series0.chart-line-symbol { -fx-background-color: rgb(94.0, 203.0, 234.0), white; }
+
+.graph2 .series1.chart-series-line { -fx-stroke: rgb(243.0, 98.0, 45.0); }
+.graph2 .series1.chart-line-symbol { -fx-background-color: rgb(243.0, 98.0, 45.0), white; }
+
+.graph3 .series0.chart-series-line { -fx-stroke: rgb(94.0, 203.0, 234.0); }
+.graph3 .series0.chart-line-symbol { -fx-background-color: rgb(94.0, 203.0, 234.0), white; }
+
+.graph3 .series1.chart-series-line { -fx-stroke: rgb(243.0, 98.0, 45.0); }
+.graph3 .series1.chart-line-symbol { -fx-background-color: rgb(243.0, 98.0, 45.0), white; }
+
+.graph4 .series0.chart-series-line { -fx-stroke: rgb(94.0, 203.0, 234.0); }
+.graph4 .series0.chart-line-symbol { -fx-background-color: rgb(94.0, 203.0, 234.0), white; }
+
+.graph4 .series1.chart-series-line { -fx-stroke: rgb(243.0, 98.0, 45.0); }
+.graph4 .series1.chart-line-symbol { -fx-background-color: rgb(243.0, 98.0, 45.0), white; }
+
+.model-label {
+    -fx-text-fill: rgb(94.0, 203.0, 234.0);
+    -fx-font-size: 16;
+}
+
+.data-label {
+    -fx-text-fill: rgb(243.0, 98.0, 45.0);
+    -fx-font-size: 16;
+}

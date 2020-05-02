@@ -17,12 +17,13 @@ class Graph : View("Графики") {
         xAxis1.animated = false
         yAxis1.label = "Человек"
         yAxis1.animated = false
-        val chart1 = AreaChart(xAxis1, yAxis1)
+        val chart1 = LineChart(xAxis1, yAxis1)
         chart1.styleClass.add("graph1")
         chart1.title = "Общее число случаев"
         chart1.animated = false
         chart1.isLegendVisible = false
         chart1.data.add(controller.series1)
+        chart1.data.add(controller.series1Real)
 
         // Число зарегистрированных активных больных
         val xAxis2 = CategoryAxis()
@@ -31,12 +32,13 @@ class Graph : View("Графики") {
         xAxis2.animated = false
         yAxis2.label = "Человек"
         yAxis2.animated = false
-        val chart2 = AreaChart(xAxis2, yAxis2)
+        val chart2 = LineChart(xAxis2, yAxis2)
         chart2.styleClass.add("graph2")
         chart2.title = "Число активных больных"
         chart2.animated = false
         chart2.isLegendVisible = false
         chart2.data.add(controller.series2)
+        chart2.data.add(controller.series2Real)
 
         // Число зарегистрированных новых случаев
         val xAxis3 = CategoryAxis()
@@ -45,12 +47,13 @@ class Graph : View("Графики") {
         xAxis3.animated = false
         yAxis3.label = "Человек"
         yAxis3.animated = false
-        val chart3 = AreaChart(xAxis3, yAxis3)
+        val chart3 = LineChart(xAxis3, yAxis3)
         chart3.styleClass.add("graph3")
         chart3.title = "Число новых случаев"
         chart3.animated = false
         chart3.isLegendVisible = false
         chart3.data.add(controller.series3)
+        chart3.data.add(controller.series3Real)
 
         // Общее число смертей
         val xAxis4 = CategoryAxis()
@@ -59,12 +62,13 @@ class Graph : View("Графики") {
         xAxis4.animated = false
         yAxis4.label = "Человек"
         yAxis4.animated = false
-        val chart4 = AreaChart(xAxis4, yAxis4)
+        val chart4 = LineChart(xAxis4, yAxis4)
         chart4.styleClass.add("graph4")
         chart4.title = "Общее число смертей"
         chart4.animated = false
         chart4.isLegendVisible = false
         chart4.data.add(controller.series4)
+        chart4.data.add(controller.series4Real)
 
         vbox {
             hbox {

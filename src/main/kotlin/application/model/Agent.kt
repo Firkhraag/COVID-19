@@ -8,29 +8,63 @@ class Agent(private val isMale: Boolean,
 
     // Состояние здоровья
     // 0 - восприимчивый, 1 - инфицированный, 2 - выздоровевший, 3 - готов перейти в инкубационный период, 4 - мертв
-    var healthStatus = if ((0..9999).random() == 0) 1 else 0
+    var healthStatus = if ((0..99999).random() == 0) 1 else 0
 
     // Дней с момента инфицирования
     var daysInfected = 0
 
     // Период болезни
-    var shouldBeInfected = 0
-    fun willBeInfectedPeriod(): Int {
-        // Erlang distribution (mean = 15.0, SD = 3.0)
-        val mean = 15.0
-        val variance = 9.0
-        var scale = variance / mean
-        var shape = round(mean / scale)
-        scale = mean / shape
-        val erlangDistribution = org.apache.commons.math3.distribution.GammaDistribution(
-            shape, scale)
-        // From 4 days
-        return erlangDistribution.sample().roundToInt()
+    var infectionPeriod = 0
+    fun willBeInfectionPeriod() {
+        // Тяжелый случай
+        // Erlang distribution (mean = 31.0, SD = 10.44)
+        val minValueCritical = 18.0
+        val maxValueCritical = 48.0
+        val meanCritical = 31.0
+        val varianceCritical = 109.0
+
+        // Средний случай
+        // Erlang distribution (mean = 20.0, SD = 4.45)
+        val minValue = 8.0
+        val maxValue = 37.0
+        val mean = 20.0
+        val variance = 19.8
+
+        // Бессимптомный случай
+        // Erlang distribution (mean = 14.0, SD = 3.0) (предположение)
+        val minValueAsymptomatic = 7.0
+        val maxValueAsymptomatic = 24.0
+        val meanAsymptomatic = 14.0
+        val varianceAsymptomatic = 9.0
+
+        infectionPeriod = when {
+            isAsymptomatic -> {
+                var scale = varianceAsymptomatic / meanAsymptomatic
+                var shape = round(meanAsymptomatic / scale)
+                scale = meanAsymptomatic / shape
+                val erlangDistribution = org.apache.commons.math3.distribution.GammaDistribution(shape, scale)
+                min(maxValueAsymptomatic, max(minValueAsymptomatic, erlangDistribution.sample())).roundToInt()
+            }
+            willBeInCriticalCondition -> {
+                var scale = varianceCritical / meanCritical
+                var shape = round(meanCritical / scale)
+                scale = meanCritical / shape
+                val erlangDistribution = org.apache.commons.math3.distribution.GammaDistribution(shape, scale)
+                min(maxValueCritical, max(minValueCritical, erlangDistribution.sample())).roundToInt()
+            }
+            else -> {
+                var scale = variance / mean
+                var shape = round(mean / scale)
+                scale = mean / shape
+                val erlangDistribution = org.apache.commons.math3.distribution.GammaDistribution(shape, scale)
+                min(maxValue, max(minValue, erlangDistribution.sample())).roundToInt()
+            }
+        }
     }
 
     // Инкубационный период
     var incubationPeriod = 0
-    fun willHaveIncubationPeriod(): Int {
+    fun willHaveIncubationPeriod() {
         // Erlang distribution (mean = 5.2, SD = 3.7)
         val minValue = 1.0
         val maxValue = 21.0
@@ -39,144 +73,168 @@ class Agent(private val isMale: Boolean,
         var scale = variance / mean
         var shape = round(mean / scale)
         scale = mean / shape
-        val erlangDistribution = org.apache.commons.math3.distribution.GammaDistribution(
-            shape, scale)
-        return min(maxValue, max(minValue, erlangDistribution.sample())).roundToInt()
+        val erlangDistribution = org.apache.commons.math3.distribution.GammaDistribution(shape, scale)
+        incubationPeriod = min(maxValue, max(minValue, erlangDistribution.sample())).roundToInt()
     }
 
-    // Вероятность бессимптомного протекания болезни
+    // Вероятность бессимптомного протекания болезни ?
     var isAsymptomatic = false
-    fun willBeAsymptomatic(a: Double): Boolean {
+    fun willBeAsymptomatic(a: Double) {
         val probability = if (hasComorbidity) {
             2.0 / (1 + exp(0.1 * age))
         } else {
             2.0 / (1 + exp(0.04 * age))
         }
-        return (0..9999).random() * 0.0001 < probability
-    }
-
-    // Точка максимальной тяжести болезни
-    var changePoint = 0
-    fun willHaveChangePointPeriod(): Int {
-        return shouldBeInfected / 2
+        isAsymptomatic = (0..9999).random() * 0.0001 < probability
     }
 
     // Самоизоляция
     var isIsolated = false
     var isolationPeriod = 0
-    fun willBeIsolationPeriod(): Int {
+    fun willBeIsolationPeriod() {
         // Erlang distribution (mean = 2.9, SD = 2.1)
         val mean = 2.9
         val variance = 4.41
         var scale = variance / mean
         var shape = round(mean / scale)
         scale = mean / shape
-        val erlangDistribution = org.apache.commons.math3.distribution.GammaDistribution(
-            shape, scale)
-        return erlangDistribution.sample().roundToInt()
+        val erlangDistribution = org.apache.commons.math3.distribution.GammaDistribution(shape, scale)
+        isolationPeriod = erlangDistribution.sample().roundToInt()
     }
 
     // Регистрирование случая заболевания коронавирусом
-    var isReported = false
+//    var isReported = false
     var reportPeriod = 0
-    fun willBeReportPeriod(): Int {
+    fun willBeReportPeriod() {
         // Erlang distribution (mean = 6.1, SD = 2.5)
         val mean = 6.1
         val variance = 6.25
         var scale = variance / mean
         var shape = round(mean / scale)
         scale = mean / shape
-        val erlangDistribution = org.apache.commons.math3.distribution.GammaDistribution(
-            shape, scale)
-        return max(isolationPeriod.toDouble(), erlangDistribution.sample()).roundToInt()
+        val erlangDistribution = org.apache.commons.math3.distribution.GammaDistribution(shape, scale)
+//        reportPeriod = erlangDistribution.sample().roundToInt()
+        reportPeriod = min((infectionPeriod - 1).toDouble(),
+            max(isolationPeriod.toDouble(), erlangDistribution.sample())).roundToInt()
     }
 
     // Хронические заболевания
-    var hasComorbidity = false
-    fun findComorbidity() {
-        val probability = 2 / (1 + exp(-0.0066 * age)) - 1.0
-        hasComorbidity =  (0..9999).random() * 0.0001 < probability
+    fun hasComorbidity(): Boolean {
+        val probability = 2.0 / (1 + exp(-0.0111 * age)) - 0.93
+        return (0..9999).random() * 0.0001 < probability
     }
+    var hasComorbidity = hasComorbidity()
+//    var hasComorbidity = false
+//    fun findComorbidity() {
+//        val probability = 2.0 / (1 + exp(-0.0111 * age)) - 0.93
+//        hasComorbidity =  (0..9999).random() * 0.0001 < probability
+//    }
 
     // Тяжелое состояние
-    var isInCriticalCondition = false
-    fun chanceToBeInCriticalCondition() {
+    var willBeInCriticalCondition = false
+    fun willBeInCriticalCondition() {
+        if (isAsymptomatic) {
+            return
+        }
         val probability = if (hasComorbidity) {
-            2 / (1 + exp(-0.006 * age)) - 1.0
+            2 / (1 + exp(-0.011 * age)) - 1.0
         } else {
             2 / (1 + exp(-0.001 * age)) - 1.0
         }
-        isInCriticalCondition = (0..9999).random() * 0.0001 < probability
+        willBeInCriticalCondition = (0..9999).random() * 0.0001 < probability
     }
 
     // Смерть
-    fun willDie(): Boolean {
-        val probability = if (hasComorbidity) {
-            2 / (1 + exp(-0.003 * age)) - 1.0
-        } else {
-            2 / (1 + exp(-0.0005 * age)) - 1.0
+    var willDie = false
+    fun willDie() {
+        if (!willBeInCriticalCondition) {
+            return
         }
-        return (0..9999).random() * 0.0001 < probability
+        val probability = if (hasComorbidity) {
+            2 / (1 + exp(-0.01 * age)) - 1.0
+        } else {
+            2 / (1 + exp(-0.001 * age)) - 1.0
+        }
+        willDie = (0..9999).random() * 0.0001 < probability
+    }
+
+    var dayOfDeath = 0
+    fun findDayOfDeath() {
+        if (!willDie) {
+            dayOfDeath = -1
+            return
+        }
+        // Erlang distribution (mean = 17.8, SD = 1.6)
+        val mean = 17.8
+        val variance = 2.56
+        var scale = variance / mean
+        var shape = round(mean / scale)
+        scale = mean / shape
+        val erlangDistribution = org.apache.commons.math3.distribution.GammaDistribution(shape, scale)
+        dayOfDeath = max((infectionPeriod - 1).toDouble(), erlangDistribution.sample()).roundToInt()
     }
 
     // Влияние силы инфекции
     var infectivityInfluence = 0.0
     fun findCurrentInfectivityInfluence() {
-        val influenceInChangePoint = 0.85
-        infectivityInfluence = when {
-            daysInfected <= 1 -> {
-                val k = 1.0 / incubationPeriod
-                val b = k * (incubationPeriod - 1)
-                k * daysInfected + b
-            }
-            daysInfected < changePoint -> {
-                val k = (1 - influenceInChangePoint) / (1 - changePoint)
-                val b = (changePoint - influenceInChangePoint) / (changePoint - 1)
-                k * daysInfected + b
-            }
-            else -> {
-                val k = influenceInChangePoint / (changePoint - shouldBeInfected)
-                val b = -k * shouldBeInfected
-                k * daysInfected + b
-            }
+        val influenceAtTheEnds = 0.05
+        infectivityInfluence = if (daysInfected <= 0) {
+            val a = -ln(influenceAtTheEnds) / incubationPeriod
+            exp(a * daysInfected)
+        } else {
+            val a = -ln(influenceAtTheEnds) / infectionPeriod
+            exp(-a * daysInfected)
         }
     }
 
     // Влияние восприимчивости
-    var susceptibilityInfluence = 0.0
-    fun findSusceptibilityInfluence(lowerPointInfluence: Double) {
-        susceptibilityInfluence = 0.1
-//        susceptibilityInfluence = when (age) {
-//            in 0..19 -> {
-//                val b = 2 * (1 - lowerPointInfluence)
-//                b / (1 + exp(0.2 * age)) + lowerPointInfluence
-//            }
-//            in 20..50 -> {
-//                lowerPointInfluence
-//            }
-//            else -> {
-//                val b = 2 * (1 - lowerPointInfluence)
-//                b / (1 + exp(-0.2 * (age - 70))) + lowerPointInfluence
-//            }
-//        } - 0.7
-    }
+//    fun findSusceptibilityInfluence(lowerPointInfluence: Double) {
+//        susceptibilityInfluence = 0.1
+////        susceptibilityInfluence = when (age) {
+////            in 0..19 -> {
+////                val b = 2 * (1 - lowerPointInfluence)
+////                b / (1 + exp(0.2 * age)) + lowerPointInfluence
+////            }
+////            in 20..50 -> {
+////                lowerPointInfluence
+////            }
+////            else -> {
+////                val b = 2 * (1 - lowerPointInfluence)
+////                b / (1 + exp(-0.2 * (age - 70))) + lowerPointInfluence
+////            }
+////        } - 0.7
+//    }
+//    var susceptibilityInfluence = 0.25
+    var susceptibilityInfluence = 0.318
 
     // Обновить эпидемиологические параметры при заражении
     fun updateHealthParameters(asympCoeff: Double) {
-        isAsymptomatic = willBeAsymptomatic(asympCoeff)
-        incubationPeriod = willHaveIncubationPeriod()
-        shouldBeInfected = willBeInfectedPeriod()
-        changePoint = willHaveChangePointPeriod()
-        isolationPeriod = willBeIsolationPeriod()
-        reportPeriod = willBeReportPeriod()
+        willBeAsymptomatic(asympCoeff)
+        willBeInCriticalCondition()
+        willDie()
+        findDayOfDeath()
+        willHaveIncubationPeriod()
+        willBeInfectionPeriod()
+        willBeIsolationPeriod()
+        willBeReportPeriod()
         daysInfected = 1 - incubationPeriod
+
+//        println("isAsymptomatic: $isAsymptomatic")
+//        println("isInCriticalCondition: $willBeInCriticalCondition")
+//        println("willDie: $willDie")
+//        println("dayOfDeath: $dayOfDeath")
+//        println("incubationPeriod: $incubationPeriod")
+//        println("infectionPeriod: $infectionPeriod")
+//        println("isolationPeriod: $isolationPeriod")
+//        println("reportPeriod: $reportPeriod")
+//        readLine()
     }
 
     // Массив идентификаторов агентов, с которыми происходят контакты на работе
     var connectedWorkAgents = arrayListOf<Int>()
 
     // Социальный статус (наличие работы)
-    private val hasWork = if (isMale) {
+    val hasWork = if (isMale) {
         when (age) {
             in 16..19 -> (0..99).random() < 6
             in 20..29 -> (0..99).random() < 92
@@ -199,5 +257,6 @@ class Agent(private val isMale: Boolean,
     }
 
     // Посещает работу в условиях карантина 30%
-    var isGoingToWork = if (hasWork) (0..9).random() < 3 else false
+//    var isGoingToWork = if (hasWork) (0..9).random() < 3 else false
+    var isGoingToWork = hasWork
 }
