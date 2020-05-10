@@ -19,7 +19,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
     // Месяц
     private var month = 3
     // День недели
-    private var dayOfTheWeek = 4
+    private var dayOfTheWeek = 7
     // Шаг модели
     private var globalDay = 0
 
