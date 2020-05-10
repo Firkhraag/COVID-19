@@ -40,12 +40,12 @@ class Workplace {
 
     // Добавить агента
     fun addAgent(agent: Agent) {
-        // Если все компании заполнены
-        if (indexesOfWorkplacesToFill.size == 0) {
+        // Начальный batch компаний
+        if (companies.size == 0) {
             // Добавление новых компаний
-            for (i in (1..batchSize)) {
+            for (i in (0 until batchSize)) {
                 companies.add(Group())
-                indexesOfWorkplacesToFill.add(companies.size - 1)
+                indexesOfWorkplacesToFill.add(i)
                 groupSizes.add(zipfDistribution.sample() + (minFirmSize - 1))
             }
         }
@@ -58,6 +58,10 @@ class Workplace {
             generateBarabasiAlbertNetworkForWork(companies[randomWorkplaceIndex], minFirmSize)
             // Убираем из массива компаний, нуждающихся в добавлении агентов
             indexesOfWorkplacesToFill.remove(randomWorkplaceIndex)
+            // Добавляем новую компанию
+            companies.add(Group())
+            indexesOfWorkplacesToFill.add(companies.size - 1)
+            groupSizes.add(zipfDistribution.sample() + (minFirmSize - 1))
         }
     }
 }
