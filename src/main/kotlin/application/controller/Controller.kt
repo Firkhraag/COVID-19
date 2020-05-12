@@ -49,15 +49,17 @@ open class MyController : Controller() {
     // Инициализация
     fun createPopulation() {
         world = World(progress)
+        world.setParameters(durationCoefficientTextField.get().toDouble())
     }
 
     // Симуляция
     fun runSimulation() {
         for (numOfIter in (1..1)) {
             world.runSimulation(
-                numOfIter, durationCoefficientTextField.get().toDouble(),
-                series1, series2, series3, series4, series1Real,
-                series2Real, series3Real, series4Real, dateLabelText
+                numOfIter,
+                series1, series2, series3, series4,
+                series1Real, series2Real, series3Real, series4Real,
+                dateLabelText
             )
         }
     }

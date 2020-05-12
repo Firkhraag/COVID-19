@@ -3,8 +3,7 @@ package application.model
 import kotlin.math.*
 
 // Агент (является ли мужчиной, возраст)
-class Agent(private val isMale: Boolean,
-            var age: Int) {
+class Agent(private val isMale: Boolean, var age: Int) {
 
     // Состояние здоровья
     // 0 - восприимчивый, 1 - инфицированный, 2 - выздоровевший, 3 - готов перейти в инкубационный период, 4 - мертв
@@ -158,6 +157,7 @@ class Agent(private val isMale: Boolean,
         willDie = (0..9999).random() * 0.0001 < probability
     }
 
+    // День смерти
     var dayOfDeath = 0
     fun findDayOfDeath() {
         if (!willDie) {
@@ -256,7 +256,19 @@ class Agent(private val isMale: Boolean,
         }
     }
 
-    // Посещает работу в условиях карантина 30%
-//    var isGoingToWork = if (hasWork) (0..9).random() < 3 else false
+    val isInKindergarten = when (age) {
+        // Ясли
+        in 0..2 -> (0..99).random() < 23
+        // Детсад
+        in 3..6 -> (0..99).random() < 83
+        else -> false
+    }
+
+    val isInSchool = when (age) {
+        in 7..15 -> true
+        in 16..18 -> !hasWork
+        else -> false
+    }
+
     var isGoingToWork = hasWork
 }
