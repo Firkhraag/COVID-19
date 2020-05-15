@@ -29,7 +29,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
     // Данные по заболеваемости, выздоровлению, смертности
     private val realData = arrayListOf(arrayListOf<Int>())
     // Число известных дней реальных данных
-    private val realDataDayNumber = 59
+    private val realDataDayNumber = 62
 
     // Домохозяйства
     private val households = arrayListOf<Household>()
@@ -68,9 +68,6 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
     // 3 Человека - 15%, 4 Человека - 54%, 5 Человек - 31%
     private val householdsWith3People2ChildrenPercentage = 15
     private val householdsWith34People2ChildrenPercentage = 69
-
-    // Сдвиг сигмоиды
-    private var durationBias = 0.0
 
     // Продолжительности контактов в домохозяйстве
     private fun getHouseholdContactDuration(): Double {
@@ -310,10 +307,6 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                 agent.isInKindergarten -> {
                     kindergarten.addAgent(agent)
                 }
-            }
-            // Обновление свойств у больного агента
-            if (agent.healthStatus == 1) {
-                agent.updateHealthParameters(0.05)
             }
             // Добавление в домохозяйство
             household.addAgent(agent)
@@ -609,28 +602,41 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                 // Влияние продолжительности контакта
                 val durationInfluence = if (isContactOnHoliday) {
                     // На выходных
-                    1 / (1 + exp(-getHouseholdContactDuration() + durationBias))
+                    1 / (1 + exp(-getHouseholdContactDuration() + durationInfluenceParameter))
                 } else {
                     if (((agent.isInKindergarten && !agent.isIsolated) || agent2.isInKindergarten) &&
                         (!isKindergartenHoliday)) {
                         // Один из них посещал детский сад
-                        1 / (1 + exp(-getHouseholdContactDurationWithKindergarten() + durationBias))
+                        1 / (1 + exp(-getHouseholdContactDurationWithKindergarten() + durationInfluenceParameter))
                     } else if (((agent.isGoingToWork && !agent.isIsolated) || agent2.isGoingToWork) &&
                         (!isWorkingHoliday)) {
                         // Один из них посещал работу
-                        1 / (1 + exp(-getHouseholdContactDurationWithWork() + durationBias))
+                        1 / (1 + exp(-getHouseholdContactDurationWithWork() + durationInfluenceParameter))
                     } else if (((agent.isInSchool && !agent.isIsolated) || agent2.isInSchool) &&
                         (!isSchoolHoliday)) {
                         // Один из них посещал школу
-                        1 / (1 + exp(-getHouseholdContactDurationWithSchool() + durationBias))
+                        1 / (1 + exp(-getHouseholdContactDurationWithSchool() + durationInfluenceParameter))
                     } else {
                         // Оба сидят дома
-                        1 / (1 + exp(-getHouseholdContactDuration() + durationBias))
+                        1 / (1 + exp(-getHouseholdContactDuration() + durationInfluenceParameter))
                     }
                 }
                 // Вероятность заражения при контакте
                 val probabilityOfInfection = agent.infectivityInfluence *
                         agent.susceptibilityInfluence * durationInfluence
+//                println("Infectivity: ${agent.infectivityInfluence}")
+//                println("Susceptibility: ${agent.susceptibilityInfluence}")
+//                println("Duration: ${durationInfluence}")
+//                println("Probability: $probabilityOfInfection")
+//                readLine()
+
+//                if (agent.infectivityInfluence > 0.001) {
+//                    println("Infectivity: ${agent.infectivityInfluence}")
+//                    println("Susceptibility: ${agent.susceptibilityInfluence}")
+//                    println("Duration: ${durationInfluence}")
+//                    println("Probability: $probabilityOfInfection")
+//                    readLine()
+//                }
                 if (randomNum < probabilityOfInfection) {
                     agent2.healthStatus = 3
                 }
@@ -648,9 +654,9 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                 // Влияние продолжительности контакта
                 val durationInfluence = when {
                     agent.isInKindergarten -> 1 / (1 + exp(
-                        -getKindergartenContactDuration() + durationBias))
+                        -getKindergartenContactDuration() + durationInfluenceParameter))
                     agent.isInSchool -> 1 / (1 + exp(
-                        -getSchoolContactDuration() + durationBias))
+                        -getSchoolContactDuration() + durationInfluenceParameter))
                     else -> error("Should be in a collective")
                 }
                 // Вероятность заражения при контакте
@@ -672,7 +678,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                 val randomNum = (0..9999).random() * 0.0001
                 // Влияние продолжительности контакта
                 val durationInfluence = 1 / (1 + exp(
-                    -getWorkplaceContactDuration() + durationBias))
+                    -getWorkplaceContactDuration() + durationInfluenceParameter))
                 // Вероятность заражения при контакте
                 val probabilityOfInfection = agent.infectivityInfluence *
                         agent.susceptibilityInfluence * durationInfluence
@@ -681,10 +687,6 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                 }
             }
         }
-    }
-
-    fun setParameters(db: Double) {
-        durationBias = db
     }
 
     // Симуляция
@@ -876,7 +878,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                         // Переход в инфицированное состояние
                         3 -> {
                             agent.healthStatus = 1
-                            agent.updateHealthParameters(0.05)
+                            agent.updateHealthParameters()
                         }
                         1 -> {
                             if (agent.daysInfected == agent.infectionPeriod) {
@@ -953,7 +955,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
             // Меняем день
             day += 1
             // Условие прекращения работы симуляции
-            if ((month == 5) && (day == 12)) {
+            if ((month == 5) && (day == 16)) {
                 break
             }
             // Меняем день недели
@@ -993,6 +995,13 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
 
         println("Creating households...")
         addHouseholdsToPool(districtsAgeSexRatioMatrix)
+
+        for (i in (1..startingInfectedParameter)) {
+            val household = households[(0 until households.size).random()]
+            val agent = household.group.agents[(0 until household.group.agents.size).random()]
+            agent.healthStatus = 1
+            agent.updateHealthParameters()
+        }
     }
 
     fun restartWorld() {
@@ -1003,11 +1012,15 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
 
         households.parallelStream().forEach { household ->
             household.group.agents.forEach { agent ->
-                agent.healthStatus = if ((0..99999).random() == 0) 1 else 0
-                if (agent.healthStatus == 1) {
-                    agent.updateHealthParameters(0.05)
-                }
+                agent.healthStatus = 0
             }
+        }
+
+        for (i in (1..startingInfectedParameter)) {
+            val household = households[(0 until households.size).random()]
+            val agent = household.group.agents[(0 until household.group.agents.size).random()]
+            agent.healthStatus = 1
+            agent.updateHealthParameters()
         }
 
         workplace.companies.parallelStream().forEach { company ->

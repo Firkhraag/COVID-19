@@ -4,7 +4,9 @@ import application.controller.MyController
 import javafx.application.Platform
 import javafx.beans.property.SimpleStringProperty
 import javafx.concurrent.Task
+import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.ProgressBar
 import javafx.scene.paint.Color
@@ -13,8 +15,6 @@ import tornadofx.*
 class Parameters : View("Параметры") {
 
     private val controller: MyController by inject()
-
-    private var buttonText = SimpleStringProperty("Старт")
 
     override val root = stackpane {
 
@@ -27,92 +27,293 @@ class Parameters : View("Параметры") {
         progressBar.visibleProperty().bind(controller.showProgressBar)
         progressBar.styleClass.add("progress")
 
+//        val explanationPane1 = stackpane {
+//            label("Текст")
+//        }
+//        val questionButton1 = Button("?")
+//        questionButton1.hoverProperty().addListener { _, _, new ->
+//            if (new) {
+//                explanationPane1.show();
+//            } else {
+//                explanationPane1.hide();
+//            }
+//        }
+
         vbox {
+//
+//            hbox {
+//                vbox {
+//                    label("Свойства популяции")
+//                    label("Поля")
+//                }.apply {
+//                    styleClass.add("parameters-part")
+//                }
+//                vbox {
+//                    label("Эпидемиологические свойства")
+//                    label("Поля")
+//                }.apply {
+//                    styleClass.add("parameters-part")
+//                }
+//            }.apply {
+//                spacing = 10.0
+//            }
+
             hbox {
                 vbox {
-                    label("Коэффициент продолжительности")
-                    textfield().apply {
-                        disableProperty().bind(controller.started)
-                        textProperty().bindBidirectional(controller.durationCoefficientTextField)
+                    hbox {
+                        label("Инкубационный период")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.durationIncubationTextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 77.0
                     }
-                }.apply {
-                    alignment = Pos.CENTER
-                    spacing = 5.0
-                }
 
-                vbox {
-                    label("Коэффициент восприимчивости")
-                    textfield().apply {
-                        disableProperty().bind(controller.started)
-                        textProperty().bindBidirectional(controller.susceptibilityLowestInfluenceTextField)
+                    hbox {
+                        label("Период болезни в тяжелом случае")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.durationCriticalTextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 10.0
+                    }
+
+                    hbox {
+//                        label("Средняя продолжительность симптомного периода болезни, дней")
+                        label("Средний период болезни")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.durationSymptomaticTextField)
+                        }
+                    }.apply {
+                        managedProperty().bind(visibleProperty())
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 69.0
+                    }
+
+                    hbox {
+//                        label("Средняя продолжительность бессимптомного периода болезни, дней")
+                        label("Бессимптомный период болезни")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.durationAsymptomaticTextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 21.0
+                    }
+
+                    hbox {
+                        label("День самоизоляции")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.isolationTextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 105.0
+                    }
+
+                    hbox {
+                        label("День выявления")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.registrationTextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 128.0
+                    }
+
+                    hbox {
+                        label("День смерти")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.deathTextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 152.0
+                    }
+
+                    hbox {
+                        label("Начальное число больных")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.startingInfectedTextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+//                        spacing = 72.0
+                        spacing = 63.2
                     }
                 }.apply {
                     managedProperty().bind(visibleProperty())
                     alignment = Pos.CENTER
-                    spacing = 5.0
+                    spacing = 15.0
+                }
+
+
+                vbox {
+
+                    hbox {
+                        label("Хронические заболевания")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.comorbidity1TextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 100.0
+                    }
+
+                    hbox {
+                        label("Хронические заболевания (сдвиг)")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.comorbidity2TextField)
+                        }
+                    }.apply {
+                        managedProperty().bind(visibleProperty())
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 53.0
+                    }
+
+                    hbox {
+                        label("Бессимптомная форма (коморбидность)")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.asymptomatic1TextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 10.0
+                    }
+
+                    hbox {
+                        label("Бессимптомная форма")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.asymptomatic2TextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 124.0
+                    }
+
+                    hbox {
+                        label("Тяжелая форма (коморбидность)")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.critical1TextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 57.0
+                    }
+
+                    hbox {
+                        label("Тяжелая форма")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.critical2TextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 170.0
+                    }
+
+                    hbox {
+                        label("Смерть (коморбидность)")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.death1TextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 110.0
+                    }
+
+                    hbox {
+                        label("Смерть")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.death2TextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 224.0
+                    }
+                }.apply {
+                    managedProperty().bind(visibleProperty())
+                    alignment = Pos.CENTER
+                    spacing = 15.0
                 }
 
                 vbox {
-                    label("Коэффициент продолжительности2")
-                    textfield().apply {
-                        disableProperty().bind(controller.started)
-                        textProperty().bindBidirectional(controller.durationCoefficientTextField)
+                    hbox {
+                        label("Влияние продолжительности контакта")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.durationInfluenceTextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 10.0
                     }
+
+                    hbox {
+                        label("Влияние силы инфекции")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.viralLoadInfluenceTextField)
+                        }
+                    }.apply {
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 100.0
+                    }
+
+                    hbox {
+                        label("Влияние восприимчивости")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.susceptibilityInfluenceTextField)
+                        }
+                    }.apply {
+                        managedProperty().bind(visibleProperty())
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 84.0
+                    }
+
+                    hbox {
+                        label("Влияние восприимчивости (сдвиг)")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.susceptibilityInfluence2TextField)
+                        }
+                    }.apply {
+                        managedProperty().bind(visibleProperty())
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 37.0
+                    }
+
+
                 }.apply {
+                    managedProperty().bind(visibleProperty())
                     alignment = Pos.CENTER
-                    spacing = 5.0
+                    spacing = 15.0
                 }
             }.apply {
-                managedProperty().bind(visibleProperty())
-                alignment = Pos.CENTER
                 spacing = 50.0
             }
 
-            vbox {
-                label("Начальная доля больных")
-                textfield().apply {
-                    disableProperty().bind(controller.started)
-                    textProperty().bindBidirectional(controller.startingRatioTextField)
-                }
-            }.apply {
-                managedProperty().bind(visibleProperty())
-                alignment = Pos.CENTER
-                spacing = 5.0
-            }
-
-            hbox {
-                vbox {
-                    label("Инкубационный период, дней")
-                    textfield().apply {
-                        disableProperty().bind(controller.started)
-                        textProperty().bindBidirectional(controller.incubationPeriodTextField)
-                    }
-                }.apply {
-                    managedProperty().bind(visibleProperty())
-                    alignment = Pos.CENTER
-                    spacing = 5.0
-                }
-
-                vbox {
-                    label("Период болезни, дней")
-                    textfield().apply {
-                        disableProperty().bind(controller.started)
-                        textProperty().bindBidirectional(controller.durationPeriodTextField)
-                    }
-                }.apply {
-                    managedProperty().bind(visibleProperty())
-                    alignment = Pos.CENTER
-                    spacing = 5.0
-                }
-
-            }.apply {
-                managedProperty().bind(visibleProperty())
-                alignment = Pos.CENTER
-                spacing = 85.0
-            }
-
-            button(buttonText).apply {
+            button("Старт").apply {
                 disableProperty().bind(controller.started)
+                styleClass.add("start-btn")
             }.setOnAction {
                 controller.started.set(true)
                 controller.showProgressBar.set(true)
@@ -131,10 +332,11 @@ class Parameters : View("Параметры") {
                 progressBar.progressProperty().bind(controller.progress)
                 Thread(task).start()
             }
-            hbox {
-                label("Создание популяции:").apply {
+            vbox {
+                label("Создание популяции").apply {
                     managedProperty().bind(visibleProperty())
                     visibleProperty().bind(controller.showProgressBar)
+                    styleClass.add("progress-label")
                 }
                 add(progressBar)
             }.apply {
@@ -142,8 +344,9 @@ class Parameters : View("Параметры") {
                 alignment = Pos.CENTER
             }
         }.apply {
-            spacing = 20.0
-            alignment = Pos.CENTER
+            spacing = 33.0
+            padding = Insets(40.0, 20.0, 40.0, 20.0)
+            alignment = Pos.TOP_CENTER
         }
     }
 }

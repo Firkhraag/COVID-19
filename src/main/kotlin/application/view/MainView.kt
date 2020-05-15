@@ -2,6 +2,7 @@ package application.view
 
 import application.controller.MyController
 import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.control.Label
 import javafx.scene.control.TabPane
 import javafx.scene.layout.Priority
@@ -29,19 +30,48 @@ class MainView : View("Агентная модель COVID-19") {
 //            label("Данные")
 //            label("Модель")
 //        }
-        top = borderpane {
-            center = dateLabel
-            right = hbox {
+        top = stackpane {
+
+            hbox {
                 label("• Данные").apply {
                     styleClass.add("data-label")
+                }.apply {
+                    padding = Insets(0.0, 0.0, 0.0, 20.0)
                 }
+                add(dateLabel)
                 label("• Модель").apply {
                     styleClass.add("model-label")
+                }.apply {
+                    padding = Insets(0.0, 20.0, 0.0, 0.0)
                 }
             }.apply {
-                spacing = 20.0
-                padding = Insets(0.0, 20.0, 0.0, 0.0)
+                spacing = 15.0
+                alignment = Pos.CENTER
             }
+
+//            center = dateLabel
+//            left = label("• Данные").apply {
+//                styleClass.add("data-label")
+//            }.apply {
+//                padding = Insets(0.0, 0.0, 0.0, 20.0)
+//            }
+//            right = label("• Модель").apply {
+//                styleClass.add("model-label")
+//            }.apply {
+//                padding = Insets(0.0, 20.0, 0.0, 0.0)
+//            }
+
+//            right = hbox {
+//                label("• Данные").apply {
+//                    styleClass.add("data-label")
+//                }
+//                label("• Модель").apply {
+//                    styleClass.add("model-label")
+//                }
+//            }.apply {
+//                spacing = 20.0
+//                padding = Insets(0.0, 20.0, 0.0, 0.0)
+//            }
         }
         center = tabpane {
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
