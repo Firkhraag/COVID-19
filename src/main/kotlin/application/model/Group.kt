@@ -6,6 +6,7 @@ class Group {
     // Массив агентов
     val agents = arrayListOf<Agent>()
 
+    // Для рабочих групп
     var isActiveGroup = true
 
     // Добавить агента

@@ -95,80 +95,6 @@
 
 /*******************************************************************************
  *                                                                             *
- * Button & ToggleButton                                                       *
- *                                                                             *
- ******************************************************************************/
-.button {
-    -fx-min-width: 80;
-    -fx-max-width: 80;
-    -fx-effect: dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.30), 6.0, 0.3, 0,
-    1);
-    -fx-background-color: rgb(250, 250, 250);
-}
-
-.button-raised {
-    -fx-effect: dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.30), 6.0, 0.3, 0,
-    1);
-    -fx-background-color: rgb(250, 250, 250);
-}
-
-.button-flat {
-    -fx-effect: null;
-    -fx-background-color: transparent;
-}
-
-.toggle-button, .button {
-    -fx-text-fill: -fx-text-button-normal;
-    -fx-font-family: 'Roboto';
-    -fx-font-weight: bold;
-    -fx-background-insets: 0.0;
-    -fx-background-radius: 4.0;
-    -fx-padding: 0.7em;
-    -fx-alignment: CENTER;
-}
-
-.button-raised .button .text, .button-flat .button .text {
-    -fx-text-weight: Bold;
-}
-
-.button:default {
-    -fx-background-color: -swatch-500;
-    -fx-text-fill: -fx-text-button-colored;
-}
-
-.toggle-button:focused, .button:focused, .button:default:focused {
-    -fx-background-color: -swatch-light-grey;
-}
-
-.toggle-button:focused:selected {
-    -fx-background-color: derive(-swatch-500, 50.0%),
-    derive(-swatch-500, -20.0%);
-    -fx-background-insets: 0.0, 0.2em;
-    -fx-text-fill: -fx-text-button-colored;
-}
-
-.toggle-button:armed, .toggle-button:selected, .button:armed, .button:default:armed
-{
-    -fx-background-color: -swatch-grey;
-    -fx-text-fill: -fx-text-button-colored;
-}
-
-.icon-button {
-    -fx-background-color: transparent;
-    -fx-pref-height: 42;
-    -fx-pref-width: 42;
-    -fx-min-height: 42;
-    -fx-min-width: 42;
-    -fx-padding: 0;
-}
-
-.icon-button .text {
-    -fx-font-family: 'MaterialDesignIconicFont';
-    -fx-font-size: 24px;
-}
-
-/*******************************************************************************
- *                                                                             *
  * ComboBox, ChoiceBox COMMON                                                 *
  *                                                                             *
  ******************************************************************************/
@@ -799,10 +725,6 @@ TABPANE
     -fx-background-insets: 0;
 }
 
-.tab-pane .tab-header-area .tab .tab-label {
-    -fx-text-fill: #337ab7;
-}
-
 .tab-pane .tab-header-area .tab:hover {
     -fx-background-color: #eeeeee;
 }
@@ -1213,7 +1135,7 @@ TABPANE
 }
 
 .date-label {
-    -fx-font-size: 24;
+    -fx-font-size: 20;
 }
 
 .progress {
@@ -1260,4 +1182,50 @@ TABPANE
 .data-label {
     -fx-text-fill: rgb(243.0, 98.0, 45.0);
     -fx-font-size: 16;
+}
+
+.text-field {
+    -fx-min-width: 100;
+    -fx-border-color: black;
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-border-style: solid;
+    -fx-alignment: center;
+}
+
+.text-field:focused {
+    -fx-border-color: rgb(125, 125, 125);
+}
+
+.question-btn {
+    -fx-min-width: 20;
+    -fx-max-width: 20;
+    -fx-min-height: 20;
+    -fx-max-height: 20;
+    -fx-alignment: center;
+    -fx-font-size: 11;
+}
+
+.buttonback {
+    -fx-min-width: 80;
+    -fx-max-width: 80;
+    -fx-effect: dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.30), 6.0, 0.3, 0,
+    1);
+    -fx-background-color: rgb(250, 250, 250);
+}
+
+.start-btn {
+    -fx-min-width: 200;
+    -fx-max-width: 200;
+    -fx-effect: dropshadow(gaussian, rgb(0.0, 0.0, 0.0, 0.30), 6.0, 0.3, 0,
+    1);
+    -fx-background-color: rgb(250, 250, 250);
+}
+
+.start-btn:hover {
+    -fx-background-color: rgb(235, 235, 235);
+}
+
+.progress-label {
+    -fx-font-size: 18;
 }

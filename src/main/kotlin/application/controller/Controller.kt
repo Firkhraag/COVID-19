@@ -1,6 +1,7 @@
 package application.controller
 
 import application.model.World
+import application.model.setParameters
 import javafx.beans.property.ReadOnlyDoubleWrapper
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
@@ -40,14 +41,57 @@ open class MyController : Controller() {
     val progress = ReadOnlyDoubleWrapper()
 
     // Параметры
-    val durationCoefficientTextField = SimpleStringProperty("6.0")
-    val susceptibilityLowestInfluenceTextField = SimpleStringProperty("0.8")
-    val startingRatioTextField = SimpleStringProperty("0.0001")
-    val incubationPeriodTextField = SimpleStringProperty("5.2")
-    val durationPeriodTextField = SimpleStringProperty("15.0")
+
+    val durationIncubationTextField = SimpleStringProperty("5.2")
+    val durationCriticalTextField = SimpleStringProperty("31.0")
+    val durationSymptomaticTextField = SimpleStringProperty("20.0")
+    val durationAsymptomaticTextField = SimpleStringProperty("14.0")
+    val isolationTextField = SimpleStringProperty("2.9")
+    val registrationTextField = SimpleStringProperty("6.1")
+    val deathTextField = SimpleStringProperty("17.8")
+    val startingInfectedTextField = SimpleStringProperty("50")
+
+    val comorbidity1TextField = SimpleStringProperty("0.0111")
+    val comorbidity2TextField = SimpleStringProperty("0.93")
+    val asymptomatic1TextField = SimpleStringProperty("0.1")
+    val asymptomatic2TextField = SimpleStringProperty("0.04")
+    val critical1TextField = SimpleStringProperty("0.011")
+    val critical2TextField = SimpleStringProperty("0.001")
+    val death1TextField = SimpleStringProperty("0.01")
+    val death2TextField = SimpleStringProperty("0.001")
+
+    val durationInfluenceTextField = SimpleStringProperty("6.0")
+    val viralLoadInfluenceTextField = SimpleStringProperty("0.05")
+//    val susceptibilityInfluenceTextField = SimpleStringProperty("0.318")
+    val susceptibilityInfluenceTextField = SimpleStringProperty("0.9")
+    val susceptibilityInfluence2TextField = SimpleStringProperty("0.7")
 
     // Инициализация
     fun createPopulation() {
+        setParameters(
+            durationIncubationTextField.get().toDouble(),
+            durationCriticalTextField.get().toDouble(),
+            durationSymptomaticTextField.get().toDouble(),
+            durationAsymptomaticTextField.get().toDouble(),
+            isolationTextField.get().toDouble(),
+            registrationTextField.get().toDouble(),
+            deathTextField.get().toDouble(),
+            startingInfectedTextField.get().toInt(),
+
+            comorbidity1TextField.get().toDouble(),
+            comorbidity2TextField.get().toDouble(),
+            asymptomatic1TextField.get().toDouble(),
+            asymptomatic2TextField.get().toDouble(),
+            critical1TextField.get().toDouble(),
+            critical2TextField.get().toDouble(),
+            death1TextField.get().toDouble(),
+            death2TextField.get().toDouble(),
+
+            durationInfluenceTextField.get().toDouble(),
+            viralLoadInfluenceTextField.get().toDouble(),
+            susceptibilityInfluenceTextField.get().toDouble(),
+            susceptibilityInfluence2TextField.get().toDouble()
+        )
         world = World(progress)
     }
 
@@ -55,9 +99,10 @@ open class MyController : Controller() {
     fun runSimulation() {
         for (numOfIter in (1..1)) {
             world.runSimulation(
-                numOfIter, durationCoefficientTextField.get().toDouble(),
-                series1, series2, series3, series4, series1Real,
-                series2Real, series3Real, series4Real, dateLabelText
+                numOfIter,
+                series1, series2, series3, series4,
+                series1Real, series2Real, series3Real, series4Real,
+                dateLabelText
             )
         }
     }
