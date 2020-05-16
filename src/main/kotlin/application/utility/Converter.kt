@@ -2,7 +2,9 @@ package application.utility
 
 import kotlin.math.abs
 
+// Deprecated
 // Конвертер gps координат (широта, долгота) в прямоугольную систему координат
+// Deprecated
 fun gpsToXy(gpsCoord: Pair<Double, Double>, width: Int, height: Int): Pair<Int, Int> {
     val topLeftGpsCoord = Pair(37.36526, 55.91366)
     val bottomRightGpsCoord = Pair(37.86479, 55.56637)

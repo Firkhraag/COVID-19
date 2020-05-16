@@ -6,6 +6,7 @@ import tornadofx.*
 
 // Deprecated
 // Карта
+// Deprecated
 class Canvas : View("Карта") {
 
     private val controller: MyController by inject()

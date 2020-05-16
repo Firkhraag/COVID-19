@@ -21,6 +21,9 @@ open class MyController : Controller() {
     val started = SimpleBooleanProperty(false)
     // Показывать прогресс по созданию домохозяйств
     val showProgressBar = SimpleBooleanProperty(false)
+    val showRunLabel = SimpleBooleanProperty(false)
+
+    val runLabelText = SimpleStringProperty("Создание популяции")
 
     // Массивы данных для отображения на графиках
     val series1 = XYChart.Series<String, Number>()
@@ -65,9 +68,10 @@ open class MyController : Controller() {
 
     val durationInfluenceTextField = SimpleStringProperty("6.0")
     val viralLoadInfluenceTextField = SimpleStringProperty("0.05")
-//    val susceptibilityInfluenceTextField = SimpleStringProperty("0.318")
     val susceptibilityInfluenceTextField = SimpleStringProperty("0.9")
     val susceptibilityInfluence2TextField = SimpleStringProperty("0.68")
+
+    val numberOfRunsTextField = SimpleStringProperty("10")
 
     // Инициализация
     fun createPopulation() {
@@ -114,14 +118,30 @@ open class MyController : Controller() {
 
     // Симуляция
     fun runSimulation() {
-        for (numOfIter in (1..1)) {
+        for (i in (1..numberOfRunsTextField.get().toInt())) {
             world.runSimulation(
-                numOfIter,
+                i,
                 series1, series2, series3, series4,
                 series1Real, series2Real, series3Real, series4Real,
                 dateLabelText
             )
+            world.restartWorld()
+            if (i != numberOfRunsTextField.get().toInt()) {
+                Platform.runLater {
+                    series1.data.clear()
+                    series2.data.clear()
+                    series3.data.clear()
+                    series4.data.clear()
+                    series1Real.data.clear()
+                    series3Real.data.clear()
+                    series4Real.data.clear()
+                    runLabelText.set("Прогон: ${i + 1}/${numberOfRunsTextField.get()}")
+                }
+            }
         }
         started.set(false)
+        Platform.runLater {
+            showRunLabel.set(false)
+        }
     }
 }

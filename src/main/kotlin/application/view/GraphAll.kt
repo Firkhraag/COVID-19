@@ -4,8 +4,9 @@ import application.controller.MyController
 import javafx.scene.chart.*
 import tornadofx.*
 
-// Not used
+// Deprecated
 // Графики всех случаев
+// Deprecated
 class GraphAll : View("Графики2") {
 
     private val controller: MyController by inject()

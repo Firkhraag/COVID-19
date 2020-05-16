@@ -2,13 +2,10 @@ package application.view
 
 import application.controller.MyController
 import javafx.application.Platform
-import javafx.beans.property.SimpleStringProperty
 import javafx.concurrent.Task
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.control.Button
 import javafx.scene.control.Label
-import javafx.scene.control.ProgressBar
 import javafx.scene.paint.Color
 import tornadofx.*
 
@@ -22,10 +19,18 @@ class Parameters : View("Параметры") {
         statusLabel.minWidth = 250.0
         statusLabel.textFill = Color.BLUE
 
-        val progressBar = ProgressBar(0.0)
-        progressBar.managedProperty().bind(visibleProperty())
-        progressBar.visibleProperty().bind(controller.showProgressBar)
-        progressBar.styleClass.add("progress")
+        val progressBar = progressbar(0.0).apply {
+            managedProperty().bind(visibleProperty())
+            visibleProperty().bind(controller.showProgressBar)
+            styleClass.add("progress")
+        }
+
+        val runLabel = label("Создание популяции").apply {
+            managedProperty().bind(visibleProperty())
+            visibleProperty().bind(controller.showRunLabel)
+            textProperty().bindBidirectional(controller.runLabelText)
+            styleClass.add("progress-label")
+        }
 
 //        val explanationPane1 = stackpane {
 //            label("Текст")
@@ -40,24 +45,6 @@ class Parameters : View("Параметры") {
 //        }
 
         vbox {
-//
-//            hbox {
-//                vbox {
-//                    label("Свойства популяции")
-//                    label("Поля")
-//                }.apply {
-//                    styleClass.add("parameters-part")
-//                }
-//                vbox {
-//                    label("Эпидемиологические свойства")
-//                    label("Поля")
-//                }.apply {
-//                    styleClass.add("parameters-part")
-//                }
-//            }.apply {
-//                spacing = 10.0
-//            }
-
             hbox {
                 vbox {
                     hbox {
@@ -159,7 +146,6 @@ class Parameters : View("Параметры") {
 
 
                 vbox {
-
                     hbox {
                         label("Хронические заболевания")
                         textfield().apply {
@@ -301,6 +287,17 @@ class Parameters : View("Параметры") {
                         spacing = 37.0
                     }
 
+                    hbox {
+                        label("Количество прогонов")
+                        textfield().apply {
+                            disableProperty().bind(controller.started)
+                            textProperty().bindBidirectional(controller.numberOfRunsTextField)
+                        }
+                    }.apply {
+                        managedProperty().bind(visibleProperty())
+                        alignment = Pos.CENTER_LEFT
+                        spacing = 118.0
+                    }
 
                 }.apply {
                     managedProperty().bind(visibleProperty())
@@ -317,12 +314,14 @@ class Parameters : View("Параметры") {
             }.setOnAction {
                 controller.started.set(true)
                 controller.showProgressBar.set(true)
+                controller.showRunLabel.set(true)
 
                 val task = object : Task<Boolean?>() {
                     override fun call(): Boolean? {
                         controller.createPopulation()
                         controller.showProgressBar.set(false)
                         Platform.runLater {
+                            controller.runLabelText.set("Прогон: 1/${controller.numberOfRunsTextField.get()}")
                             controller.dateLabelText.set("1 Марта")
                         }
                         controller.runSimulation()
@@ -333,11 +332,7 @@ class Parameters : View("Параметры") {
                 Thread(task).start()
             }
             vbox {
-                label("Создание популяции").apply {
-                    managedProperty().bind(visibleProperty())
-                    visibleProperty().bind(controller.showProgressBar)
-                    styleClass.add("progress-label")
-                }
+                add(runLabel)
                 add(progressBar)
             }.apply {
                 spacing = 20.0
