@@ -2,6 +2,7 @@ package application.controller
 
 import application.model.World
 import application.model.setParameters
+import javafx.application.Platform
 import javafx.beans.property.ReadOnlyDoubleWrapper
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
@@ -13,6 +14,8 @@ open class MyController : Controller() {
 
     // Модель
     private lateinit var world: World
+    // Популяция инициализирована
+    private var populationIsCreated = false
 
     // Модель работает
     val started = SimpleBooleanProperty(false)
@@ -64,7 +67,7 @@ open class MyController : Controller() {
     val viralLoadInfluenceTextField = SimpleStringProperty("0.05")
 //    val susceptibilityInfluenceTextField = SimpleStringProperty("0.318")
     val susceptibilityInfluenceTextField = SimpleStringProperty("0.9")
-    val susceptibilityInfluence2TextField = SimpleStringProperty("0.7")
+    val susceptibilityInfluence2TextField = SimpleStringProperty("0.68")
 
     // Инициализация
     fun createPopulation() {
@@ -92,7 +95,21 @@ open class MyController : Controller() {
             susceptibilityInfluenceTextField.get().toDouble(),
             susceptibilityInfluence2TextField.get().toDouble()
         )
-        world = World(progress)
+        if (!populationIsCreated) {
+            world = World(progress)
+            populationIsCreated = true
+        } else {
+            world.restartWorld()
+            Platform.runLater {
+                series1.data.clear()
+                series2.data.clear()
+                series3.data.clear()
+                series4.data.clear()
+                series1Real.data.clear()
+                series3Real.data.clear()
+                series4Real.data.clear()
+            }
+        }
     }
 
     // Симуляция
@@ -105,5 +122,6 @@ open class MyController : Controller() {
                 dateLabelText
             )
         }
+        started.set(false)
     }
 }

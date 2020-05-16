@@ -31,6 +31,13 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
     // Число известных дней реальных данных
     private val realDataDayNumber = 62
 
+    // Случаи по возрастам
+    private var ageStats = arrayListOf(0, 0, 0, 0, 0, 0, 0, 0)
+    // Тяжелые случаи по возрастам: 0-9, 10-19, 20-29, 30-39, 40-49, 50-59, 60-69, 70+
+    private var criticalStats = arrayListOf(0, 0, 0, 0, 0, 0, 0, 0)
+    // Смерти по возрастам: 0-9, 10-19, 20-29, 30-39, 40-49, 50-59, 60-69, 70+
+    private var deathStats = arrayListOf(0, 0, 0, 0, 0, 0, 0, 0)
+
     // Домохозяйства
     private val households = arrayListOf<Household>()
     // Рабочие коллективы
@@ -879,6 +886,40 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                         3 -> {
                             agent.healthStatus = 1
                             agent.updateHealthParameters()
+                            when (agent.age) {
+                                in 0..9 -> ageStats[0]++
+                                in 10..19 -> ageStats[1]++
+                                in 20..29 -> ageStats[2]++
+                                in 30..39 -> ageStats[3]++
+                                in 40..49 -> ageStats[4]++
+                                in 50..59 -> ageStats[5]++
+                                in 60..69 -> ageStats[6]++
+                                else -> ageStats[7]++
+                            }
+                            if (agent.willBeInCriticalCondition) {
+                                if (agent.willDie) {
+                                    when (agent.age) {
+                                        in 0..9 -> deathStats[0]++
+                                        in 10..19 -> deathStats[1]++
+                                        in 20..29 -> deathStats[2]++
+                                        in 30..39 -> deathStats[3]++
+                                        in 40..49 -> deathStats[4]++
+                                        in 50..59 -> deathStats[5]++
+                                        in 60..69 -> deathStats[6]++
+                                        else -> deathStats[7]++
+                                    }
+                                }
+                                when (agent.age) {
+                                    in 0..9 -> criticalStats[0]++
+                                    in 10..19 -> criticalStats[1]++
+                                    in 20..29 -> criticalStats[2]++
+                                    in 30..39 -> criticalStats[3]++
+                                    in 40..49 -> criticalStats[4]++
+                                    in 50..59 -> criticalStats[5]++
+                                    in 60..69 -> criticalStats[6]++
+                                    else -> criticalStats[7]++
+                                }
+                            }
                         }
                         1 -> {
                             if (agent.daysInfected == agent.infectionPeriod) {
@@ -956,6 +997,24 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
             day += 1
             // Условие прекращения работы симуляции
             if ((month == 5) && (day == 16)) {
+                println("-----------Critical-----------")
+                println("0-9 Critical: ${criticalStats[0] / ageStats[0].toDouble()}")
+                println("10-19 Critical: ${criticalStats[1] / ageStats[1].toDouble()}")
+                println("20-29 Critical: ${criticalStats[2] / ageStats[2].toDouble()}")
+                println("30-39 Critical: ${criticalStats[3] / ageStats[3].toDouble()}")
+                println("40-49 Critical: ${criticalStats[4] / ageStats[4].toDouble()}")
+                println("50-59 Critical: ${criticalStats[5] / ageStats[5].toDouble()}")
+                println("60-69 Critical: ${criticalStats[6] / ageStats[6].toDouble()}")
+                println("70+ Critical: ${criticalStats[7] / ageStats[7].toDouble()}")
+                println("------------Death------------")
+                println("0-9 Death: ${deathStats[0] / ageStats[0].toDouble()}")
+                println("10-19 Death: ${deathStats[1] / ageStats[1].toDouble()}")
+                println("20-29 Death: ${deathStats[2] / ageStats[2].toDouble()}")
+                println("30-39 Death: ${deathStats[3] / ageStats[3].toDouble()}")
+                println("40-49 Death: ${deathStats[4] / ageStats[4].toDouble()}")
+                println("50-59 Death: ${deathStats[5] / ageStats[5].toDouble()}")
+                println("60-69 Death: ${deathStats[6] / ageStats[6].toDouble()}")
+                println("70+ Death: ${deathStats[7] / ageStats[7].toDouble()}")
                 break
             }
             // Меняем день недели
@@ -1001,6 +1060,40 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
             val agent = household.group.agents[(0 until household.group.agents.size).random()]
             agent.healthStatus = 1
             agent.updateHealthParameters()
+            when (agent.age) {
+                in 0..9 -> ageStats[0]++
+                in 10..19 -> ageStats[1]++
+                in 20..29 -> ageStats[2]++
+                in 30..39 -> ageStats[3]++
+                in 40..49 -> ageStats[4]++
+                in 50..59 -> ageStats[5]++
+                in 60..69 -> ageStats[6]++
+                else -> ageStats[7]++
+            }
+            if (agent.willBeInCriticalCondition) {
+                if (agent.willDie) {
+                    when (agent.age) {
+                        in 0..9 -> deathStats[0]++
+                        in 10..19 -> deathStats[1]++
+                        in 20..29 -> deathStats[2]++
+                        in 30..39 -> deathStats[3]++
+                        in 40..49 -> deathStats[4]++
+                        in 50..59 -> deathStats[5]++
+                        in 60..69 -> deathStats[6]++
+                        else -> deathStats[7]++
+                    }
+                }
+                when (agent.age) {
+                    in 0..9 -> criticalStats[0]++
+                    in 10..19 -> criticalStats[1]++
+                    in 20..29 -> criticalStats[2]++
+                    in 30..39 -> criticalStats[3]++
+                    in 40..49 -> criticalStats[4]++
+                    in 50..59 -> criticalStats[5]++
+                    in 60..69 -> criticalStats[6]++
+                    else -> criticalStats[7]++
+                }
+            }
         }
     }
 
@@ -1009,6 +1102,11 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
         month = 3
         dayOfTheWeek = 7
         globalDay = 0
+
+        stats = arrayListOf(0, 0, 0, 0, 0)
+        ageStats = arrayListOf(0, 0, 0, 0, 0, 0, 0, 0)
+        criticalStats = arrayListOf(0, 0, 0, 0, 0, 0, 0, 0)
+        deathStats = arrayListOf(0, 0, 0, 0, 0, 0, 0, 0)
 
         households.parallelStream().forEach { household ->
             household.group.agents.forEach { agent ->
@@ -1021,14 +1119,46 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
             val agent = household.group.agents[(0 until household.group.agents.size).random()]
             agent.healthStatus = 1
             agent.updateHealthParameters()
+            when (agent.age) {
+                in 0..9 -> ageStats[0]++
+                in 10..19 -> ageStats[1]++
+                in 20..29 -> ageStats[2]++
+                in 30..39 -> ageStats[3]++
+                in 40..49 -> ageStats[4]++
+                in 50..59 -> ageStats[5]++
+                in 60..69 -> ageStats[6]++
+                else -> ageStats[7]++
+            }
+            if (agent.willBeInCriticalCondition) {
+                if (agent.willDie) {
+                    when (agent.age) {
+                        in 0..9 -> deathStats[0]++
+                        in 10..19 -> deathStats[1]++
+                        in 20..29 -> deathStats[2]++
+                        in 30..39 -> deathStats[3]++
+                        in 40..49 -> deathStats[4]++
+                        in 50..59 -> deathStats[5]++
+                        in 60..69 -> deathStats[6]++
+                        else -> deathStats[7]++
+                    }
+                }
+                when (agent.age) {
+                    in 0..9 -> criticalStats[0]++
+                    in 10..19 -> criticalStats[1]++
+                    in 20..29 -> criticalStats[2]++
+                    in 30..39 -> criticalStats[3]++
+                    in 40..49 -> criticalStats[4]++
+                    in 50..59 -> criticalStats[5]++
+                    in 60..69 -> criticalStats[6]++
+                    else -> criticalStats[7]++
+                }
+            }
         }
 
         workplace.companies.parallelStream().forEach { company ->
-            if ((0..9).random() < 7) {
-                company.isActiveGroup = true
-                company.agents.forEach { agent ->
-                    agent.isGoingToWork = true
-                }
+            company.isActiveGroup = true
+            company.agents.forEach { agent ->
+                agent.isGoingToWork = true
             }
         }
     }
