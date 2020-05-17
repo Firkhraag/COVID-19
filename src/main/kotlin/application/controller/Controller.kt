@@ -66,10 +66,10 @@ open class MyController : Controller() {
     val death1TextField = SimpleStringProperty("0.01")
     val death2TextField = SimpleStringProperty("0.001")
 
-    val durationInfluenceTextField = SimpleStringProperty("6.0")
+    val durationInfluenceTextField = SimpleStringProperty("6.5")
     val viralLoadInfluenceTextField = SimpleStringProperty("0.05")
     val susceptibilityInfluenceTextField = SimpleStringProperty("0.9")
-    val susceptibilityInfluence2TextField = SimpleStringProperty("0.68")
+    val susceptibilityInfluence2TextField = SimpleStringProperty("0.6")
 
     val numberOfRunsTextField = SimpleStringProperty("10")
 
