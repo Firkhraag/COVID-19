@@ -7,7 +7,6 @@ class Agent(private val isMale: Boolean, var age: Int) {
 
     // Состояние здоровья
     // 0 - восприимчивый, 1 - инфицированный, 2 - выздоровевший, 3 - готов перейти в инкубационный период, 4 - мертв
-//    var healthStatus = if ((0..99999).random() == 0) 1 else 0
     var healthStatus = 0
 
     // Дней с момента инфицирования
@@ -78,17 +77,8 @@ class Agent(private val isMale: Boolean, var age: Int) {
     }
 
     // Хронические заболевания
-    fun hasComorbidity(): Boolean {
-        val probability = 2.0 / (1 + exp(-comorbidity1Parameter * age)) - comorbidity2Parameter
-        return (0..9999).random() * 0.0001 < probability
-    }
-    var hasComorbidity = hasComorbidity()
-
-//    var hasComorbidity = false
-//    fun findComorbidity() {
-//        val probability = 2.0 / (1 + exp(-0.0111 * age)) - 0.93
-//        hasComorbidity =  (0..9999).random() * 0.0001 < probability
-//    }
+    private var hasComorbidity = (0..9999).random() * 0.0001 <
+            2.0 / (1 + exp(-comorbidity1Parameter * age)) - comorbidity2Parameter
 
     // Вероятность бессимптомного протекания болезни ?
     var isAsymptomatic = false
@@ -202,27 +192,6 @@ class Agent(private val isMale: Boolean, var age: Int) {
             b / (1 + exp(-0.35 * (age - 70))) + susceptibilityInfluenceParameter
         }
     } - susceptibilityInfluence2Parameter
-//    fun findSusceptibilityInfluence() {
-//        val lowerPointInfluence = 0.1
-////        susceptibilityInfluence = 0.1
-//        susceptibilityInfluence = when (age) {
-//            in 0..19 -> {
-//                val b = 2 * (1 - lowerPointInfluence)
-//                b / (1 + exp(0.35 * age)) + lowerPointInfluence
-//            }
-//            in 20..50 -> {
-//                lowerPointInfluence
-//            }
-//            else -> {
-//                val b = 2 * (1 - lowerPointInfluence)
-//                b / (1 + exp(-0.35 * (age - 70))) + lowerPointInfluence
-//            }
-//        } - 0.7
-//    }
-////    var susceptibilityInfluence = 0.25
-//
-////    var susceptibilityInfluence = 0.318
-//    var susceptibilityInfluence = susceptibilityInfluenceParameter
 
     // Обновить эпидемиологические параметры при заражении
     fun updateHealthParameters() {
@@ -236,6 +205,7 @@ class Agent(private val isMale: Boolean, var age: Int) {
         willBeReportPeriod()
         daysInfected = 1 - incubationPeriod
 
+        // Debug
 //        println("isAsymptomatic: $isAsymptomatic")
 //        println("isInCriticalCondition: $willBeInCriticalCondition")
 //        println("willDie: $willDie")
@@ -250,7 +220,7 @@ class Agent(private val isMale: Boolean, var age: Int) {
     // Массив идентификаторов агентов, с которыми происходят контакты на работе
     var connectedWorkAgents = arrayListOf<Int>()
 
-    // Социальный статус (наличие работы)
+    // Наличие рабочего места
     val hasWork = if (isMale) {
         when (age) {
             in 16..19 -> (0..99).random() < 6
@@ -273,6 +243,7 @@ class Agent(private val isMale: Boolean, var age: Int) {
         }
     }
 
+    // Посещает детский сад
     val isInKindergarten = when (age) {
         // Ясли
         in 0..2 -> (0..99).random() < 23
@@ -281,11 +252,13 @@ class Agent(private val isMale: Boolean, var age: Int) {
         else -> false
     }
 
+    // Посещает школу
     val isInSchool = when (age) {
         in 7..15 -> true
         in 16..18 -> !hasWork
         else -> false
     }
 
+    // Посещает работу
     var isGoingToWork = hasWork
 }

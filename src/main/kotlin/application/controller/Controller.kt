@@ -2,6 +2,7 @@ package application.controller
 
 import application.model.World
 import application.model.setParameters
+import javafx.application.Platform
 import javafx.beans.property.ReadOnlyDoubleWrapper
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleStringProperty
@@ -13,11 +14,16 @@ open class MyController : Controller() {
 
     // Модель
     private lateinit var world: World
+    // Популяция инициализирована
+    private var populationIsCreated = false
 
     // Модель работает
     val started = SimpleBooleanProperty(false)
     // Показывать прогресс по созданию домохозяйств
     val showProgressBar = SimpleBooleanProperty(false)
+    val showRunLabel = SimpleBooleanProperty(false)
+
+    val runLabelText = SimpleStringProperty("Создание популяции")
 
     // Массивы данных для отображения на графиках
     val series1 = XYChart.Series<String, Number>()
@@ -60,11 +66,12 @@ open class MyController : Controller() {
     val death1TextField = SimpleStringProperty("0.01")
     val death2TextField = SimpleStringProperty("0.001")
 
-    val durationInfluenceTextField = SimpleStringProperty("6.0")
+    val durationInfluenceTextField = SimpleStringProperty("6.5")
     val viralLoadInfluenceTextField = SimpleStringProperty("0.05")
-//    val susceptibilityInfluenceTextField = SimpleStringProperty("0.318")
     val susceptibilityInfluenceTextField = SimpleStringProperty("0.9")
-    val susceptibilityInfluence2TextField = SimpleStringProperty("0.7")
+    val susceptibilityInfluence2TextField = SimpleStringProperty("0.6")
+
+    val numberOfRunsTextField = SimpleStringProperty("10")
 
     // Инициализация
     fun createPopulation() {
@@ -92,18 +99,49 @@ open class MyController : Controller() {
             susceptibilityInfluenceTextField.get().toDouble(),
             susceptibilityInfluence2TextField.get().toDouble()
         )
-        world = World(progress)
+        if (!populationIsCreated) {
+            world = World(progress)
+            populationIsCreated = true
+        } else {
+            world.restartWorld()
+            Platform.runLater {
+                series1.data.clear()
+                series2.data.clear()
+                series3.data.clear()
+                series4.data.clear()
+                series1Real.data.clear()
+                series3Real.data.clear()
+                series4Real.data.clear()
+            }
+        }
     }
 
     // Симуляция
     fun runSimulation() {
-        for (numOfIter in (1..1)) {
+        for (i in (1..numberOfRunsTextField.get().toInt())) {
             world.runSimulation(
-                numOfIter,
+                i,
                 series1, series2, series3, series4,
                 series1Real, series2Real, series3Real, series4Real,
                 dateLabelText
             )
+            world.restartWorld()
+            if (i != numberOfRunsTextField.get().toInt()) {
+                Platform.runLater {
+                    series1.data.clear()
+                    series2.data.clear()
+                    series3.data.clear()
+                    series4.data.clear()
+                    series1Real.data.clear()
+                    series3Real.data.clear()
+                    series4Real.data.clear()
+                    runLabelText.set("Прогон: ${i + 1}/${numberOfRunsTextField.get()}")
+                }
+            }
+        }
+        started.set(false)
+        Platform.runLater {
+            showRunLabel.set(false)
         }
     }
 }
