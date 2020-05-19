@@ -29,7 +29,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
     // Данные по заболеваемости, выздоровлению, смертности
     private val realData = arrayListOf(arrayListOf<Int>())
     // Число известных дней реальных данных
-    private val realDataDayNumber = 62
+    private val realDataDayNumber = 66
 
     // Случаи по возрастам
     private var ageStats = arrayListOf(0, 0, 0, 0, 0, 0, 0, 0)
@@ -1001,7 +1001,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
             day += 1
             // Условие прекращения работы симуляции
 //            if ((month == 7) && (day == 32)) {
-            if ((month == 5) && (day == 16)) {
+            if ((month == 5) && (day == 20)) {
                 println("-----------Critical-----------")
                 println("0-9 Critical: ${criticalStats[0] / ageStats[0].toDouble()}")
                 println("10-19 Critical: ${criticalStats[1] / ageStats[1].toDouble()}")
@@ -1121,9 +1121,22 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
         households.parallelStream().forEach { household ->
             household.group.agents.forEach { agent ->
                 agent.healthStatus = 0
+
                 agent.hasComorbidity = (0..9999).random() * 0.0001 <
                         exp(comorbidity1Parameter * agent.age) - comorbidity2Parameter
 
+                agent.daysInfected = 0
+                agent.incubationPeriod = 0
+                agent.infectionPeriod = 0
+                agent.isAsymptomatic = false
+                agent.isIsolated = false
+                agent.isolationPeriod = 0
+                agent.reportPeriod = 0
+                agent.willBeInCriticalCondition = false
+                agent.willDie = false
+                agent.dayOfDeath = 0
+
+                agent.infectivityInfluence = 0.0
                 agent.susceptibilityInfluence = when (agent.age) {
                     in 0..19 -> {
                         val b = 2 * (1 - susceptibilityInfluenceParameter)
