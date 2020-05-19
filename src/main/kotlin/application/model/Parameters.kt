@@ -82,3 +82,28 @@ fun setParameters(
     application.model.susceptibilityInfluenceParameter = susceptibilityInfluenceParameter
     application.model.susceptibilityInfluence2Parameter = susceptibilityInfluence2Parameter
 }
+
+fun printParameters() {
+    println("durationIncubationParameter: $durationIncubationParameter")
+    println("durationCriticalParameter: $durationCriticalParameter")
+    println("durationSymptomaticParameter: $durationSymptomaticParameter")
+    println("durationAsymptomaticParameter: $durationAsymptomaticParameter")
+    println("isolationParameter: $isolationParameter")
+    println("reportParameter: $reportParameter")
+    println("deathDayParameter: $deathDayParameter")
+    println("startingInfectedParameter: $startingInfectedParameter")
+
+    println("comorbidity1Parameter: $comorbidity1Parameter")
+    println("comorbidity2Parameter: $comorbidity2Parameter")
+    println("asymptomatic1Parameter: $asymptomatic1Parameter")
+    println("asymptomatic2Parameter: $asymptomatic2Parameter")
+    println("critical1Parameter: $critical1Parameter")
+    println("critical2Parameter: $critical2Parameter")
+    println("death1Parameter: $death1Parameter")
+    println("death2Parameter: $death2Parameter")
+
+    println("durationInfluenceParameter: $durationInfluenceParameter")
+    println("viralLoadInfluenceParameter: $viralLoadInfluenceParameter")
+    println("susceptibilityInfluenceParameter: $susceptibilityInfluenceParameter")
+    println("susceptibilityInfluence2Parameter: $susceptibilityInfluence2Parameter")
+}

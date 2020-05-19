@@ -76,13 +76,15 @@ class Agent(private val isMale: Boolean, var age: Int) {
         }
     }
 
+//    0.0057
     // Хронические заболевания
-    private var hasComorbidity = (0..9999).random() * 0.0001 <
-            2.0 / (1 + exp(-comorbidity1Parameter * age)) - comorbidity2Parameter
+    var hasComorbidity = (0..9999).random() * 0.0001 <
+        exp(comorbidity1Parameter * age) - comorbidity2Parameter
+    //            2.0 / (1 + exp(-comorbidity1Parameter * age)) - comorbidity2Parameter
 
-    // Вероятность бессимптомного протекания болезни ?
+    // Вероятность бессимптомного протекания болезни
     var isAsymptomatic = false
-    fun willBeAsymptomatic() {
+    private fun willBeAsymptomatic() {
         val probability = if (hasComorbidity) {
             2.0 / (1 + exp(asymptomatic1Parameter * age))
         } else {
@@ -128,9 +130,11 @@ class Agent(private val isMale: Boolean, var age: Int) {
             return
         }
         val probability = if (hasComorbidity) {
-            2 / (1 + exp(-critical1Parameter * age)) - 1.0
+//            2 / (1 + exp(-critical1Parameter * age)) - 1.0
+            exp(critical1Parameter * age) - 1.0
         } else {
-            2 / (1 + exp(-critical2Parameter * age)) - 1.0
+//            2 / (1 + exp(-critical2Parameter * age)) - 1.0
+            exp(critical2Parameter * age) - 1.0
         }
         willBeInCriticalCondition = (0..9999).random() * 0.0001 < probability
     }
@@ -142,9 +146,11 @@ class Agent(private val isMale: Boolean, var age: Int) {
             return
         }
         val probability = if (hasComorbidity) {
-            2 / (1 + exp(-death1Parameter * age)) - 1.0
+//            2 / (1 + exp(-death1Parameter * age)) - 1.0
+            exp(death1Parameter * age) - 1.0
         } else {
-            2 / (1 + exp(-death2Parameter * age)) - 1.0
+//            2 / (1 + exp(-death2Parameter * age)) - 1.0
+            exp(death2Parameter * age) - 1.0
         }
         willDie = (0..9999).random() * 0.0001 < probability
     }
@@ -194,7 +200,7 @@ class Agent(private val isMale: Boolean, var age: Int) {
     } - susceptibilityInfluence2Parameter
 
     // Обновить эпидемиологические параметры при заражении
-    fun updateHealthParameters() {
+    fun updateHealthParameters(initialization: Boolean) {
         willBeAsymptomatic()
         willBeInCriticalCondition()
         willDie()
@@ -203,7 +209,11 @@ class Agent(private val isMale: Boolean, var age: Int) {
         willBeInfectionPeriod()
         willBeIsolationPeriod()
         willBeReportPeriod()
-        daysInfected = 1 - incubationPeriod
+        daysInfected = if (initialization) {
+            (1 - incubationPeriod..isolationPeriod).random()
+        } else {
+            1 - incubationPeriod
+        }
 
         // Debug
 //        println("isAsymptomatic: $isAsymptomatic")

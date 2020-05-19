@@ -38,6 +38,8 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
     // Смерти по возрастам: 0-9, 10-19, 20-29, 30-39, 40-49, 50-59, 60-69, 70+
     private var deathStats = arrayListOf(0, 0, 0, 0, 0, 0, 0, 0)
 
+    private var asymptomaticStat = 0
+
     // Домохозяйства
     private val households = arrayListOf<Household>()
     // Рабочие коллективы
@@ -885,7 +887,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                         // Переход в инфицированное состояние
                         3 -> {
                             agent.healthStatus = 1
-                            agent.updateHealthParameters()
+                            agent.updateHealthParameters(false)
                             when (agent.age) {
                                 in 0..9 -> ageStats[0]++
                                 in 10..19 -> ageStats[1]++
@@ -919,6 +921,8 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                                     in 60..69 -> criticalStats[6]++
                                     else -> criticalStats[7]++
                                 }
+                            } else if (agent.isAsymptomatic) {
+                                asymptomaticStat++
                             }
                         }
                         1 -> {
@@ -996,6 +1000,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
             // Меняем день
             day += 1
             // Условие прекращения работы симуляции
+//            if ((month == 7) && (day == 32)) {
             if ((month == 5) && (day == 16)) {
                 println("-----------Critical-----------")
                 println("0-9 Critical: ${criticalStats[0] / ageStats[0].toDouble()}")
@@ -1015,6 +1020,8 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                 println("50-59 Death: ${deathStats[5] / ageStats[5].toDouble()}")
                 println("60-69 Death: ${deathStats[6] / ageStats[6].toDouble()}")
                 println("70+ Death: ${deathStats[7] / ageStats[7].toDouble()}")
+
+                println("Asymptomatic: ${asymptomaticStat / stats[0].toDouble()}")
                 break
             }
             // Меняем день недели
@@ -1033,11 +1040,9 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
             ) {
                 day = 1
                 month += 1
-                println("Month $month")
             } else if ((month == 12) && (day == 32)) {
                 day = 1
                 month = 1
-                println("Month 1")
             }
         }
     }
@@ -1059,7 +1064,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
             val household = households[(0 until households.size).random()]
             val agent = household.group.agents[(0 until household.group.agents.size).random()]
             agent.healthStatus = 1
-            agent.updateHealthParameters()
+            agent.updateHealthParameters(true)
             when (agent.age) {
                 in 0..9 -> ageStats[0]++
                 in 10..19 -> ageStats[1]++
@@ -1093,7 +1098,11 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                     in 60..69 -> criticalStats[6]++
                     else -> criticalStats[7]++
                 }
+            } else if (agent.isAsymptomatic) {
+                asymptomaticStat++
             }
+            stats[0]++
+            stats[1]++
         }
     }
 
@@ -1107,10 +1116,27 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
         ageStats = arrayListOf(0, 0, 0, 0, 0, 0, 0, 0)
         criticalStats = arrayListOf(0, 0, 0, 0, 0, 0, 0, 0)
         deathStats = arrayListOf(0, 0, 0, 0, 0, 0, 0, 0)
+        asymptomaticStat = 0
 
         households.parallelStream().forEach { household ->
             household.group.agents.forEach { agent ->
                 agent.healthStatus = 0
+                agent.hasComorbidity = (0..9999).random() * 0.0001 <
+                        exp(comorbidity1Parameter * agent.age) - comorbidity2Parameter
+
+                agent.susceptibilityInfluence = when (agent.age) {
+                    in 0..19 -> {
+                        val b = 2 * (1 - susceptibilityInfluenceParameter)
+                        b / (1 + exp(0.35 * agent.age)) + susceptibilityInfluenceParameter
+                    }
+                    in 20..50 -> {
+                        susceptibilityInfluenceParameter
+                    }
+                    else -> {
+                        val b = 2 * (1 - susceptibilityInfluenceParameter)
+                        b / (1 + exp(-0.35 * (agent.age - 70))) + susceptibilityInfluenceParameter
+                    }
+                } - susceptibilityInfluence2Parameter
             }
         }
 
@@ -1118,7 +1144,7 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
             val household = households[(0 until households.size).random()]
             val agent = household.group.agents[(0 until household.group.agents.size).random()]
             agent.healthStatus = 1
-            agent.updateHealthParameters()
+            agent.updateHealthParameters(true)
             when (agent.age) {
                 in 0..9 -> ageStats[0]++
                 in 10..19 -> ageStats[1]++
@@ -1152,7 +1178,11 @@ class World(private val progress: ReadOnlyDoubleWrapper) {
                     in 60..69 -> criticalStats[6]++
                     else -> criticalStats[7]++
                 }
+            } else if (agent.isAsymptomatic) {
+                asymptomaticStat++
             }
+            stats[0]++
+            stats[1]++
         }
 
         workplace.companies.parallelStream().forEach { company ->
