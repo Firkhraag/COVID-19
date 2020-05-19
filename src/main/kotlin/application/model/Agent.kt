@@ -13,7 +13,7 @@ class Agent(private val isMale: Boolean, var age: Int) {
     var daysInfected = 0
 
     // Инкубационный период
-    private var incubationPeriod = 0
+    var incubationPeriod = 0
     private fun willHaveIncubationPeriod() {
         // Erlang distribution (mean = 5.2, SD = 3.7)
         val minValue = 1.0

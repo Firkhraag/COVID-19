@@ -55,37 +55,21 @@ open class MyController : Controller() {
     val isolationTextField = SimpleStringProperty("2.9")
     val registrationTextField = SimpleStringProperty("6.1")
     val deathTextField = SimpleStringProperty("17.8")
-    val startingInfectedTextField = SimpleStringProperty("80")
+    val startingInfectedTextField = SimpleStringProperty("300")
 
-//    val comorbidity1TextField = SimpleStringProperty("0.0111")
     val comorbidity1TextField = SimpleStringProperty("0.0057")
     val comorbidity2TextField = SimpleStringProperty("0.93")
-//    val asymptomatic1TextField = SimpleStringProperty("0.1")
-//    val asymptomatic2TextField = SimpleStringProperty("0.04")
-
-//    val asymptomatic1TextField = SimpleStringProperty("0.2")
-//    val asymptomatic2TextField = SimpleStringProperty("0.08")
-
     val asymptomatic1TextField = SimpleStringProperty("0.15")
     val asymptomatic2TextField = SimpleStringProperty("0.07")
-
-//    val critical1TextField = SimpleStringProperty("0.011")
     val critical1TextField = SimpleStringProperty("0.0045")
-//    val critical2TextField = SimpleStringProperty("0.001")
     val critical2TextField = SimpleStringProperty("0.001")
-//    val death1TextField = SimpleStringProperty("0.01")
-    val death1TextField = SimpleStringProperty("0.004")
-//    val death2TextField = SimpleStringProperty("0.001")
+    val death1TextField = SimpleStringProperty("0.0022")
+    val death2TextField = SimpleStringProperty("0.0001")
 
-//    val death2TextField = SimpleStringProperty("0.001")
-    val death2TextField = SimpleStringProperty("0.0005")
-
-//    val durationInfluenceTextField = SimpleStringProperty("6.5")
-    val durationInfluenceTextField = SimpleStringProperty("6.6")
+    val durationInfluenceTextField = SimpleStringProperty("6.82")
     val viralLoadInfluenceTextField = SimpleStringProperty("0.05")
     val susceptibilityInfluenceTextField = SimpleStringProperty("0.9")
-    val susceptibilityInfluence2TextField = SimpleStringProperty("0.5")
-
+    val susceptibilityInfluence2TextField = SimpleStringProperty("0.65")
     val numberOfRunsTextField = SimpleStringProperty("10")
 
     // Инициализация

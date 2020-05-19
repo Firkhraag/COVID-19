@@ -52,9 +52,9 @@ for i in range(0, row_number):
 print("Общее число смертей RSS:", int(rss3))
 
 
-# Общее число случаев RSS: 246959681
-# Число новых случаев RSS: 1338702
-# Общее число смертей RSS: 8621
+# Общее число случаев RSS: 165690343
+# Число новых случаев RSS: 1419286
+# Общее число смертей RSS: 575
 
 
 plt.plot(np.linspace(1, row_number, row_number), stats.iloc[:, 6], c='r', label="данные x2")
@@ -65,6 +65,7 @@ plt.xlabel("День")
 plt.ylabel("Человек")
 plt.legend()
 
+plt.show()
 
 plt.figure()
 plt.plot(np.linspace(1, row_number, row_number), stats.iloc[:, 5], c='r', label="данные")
@@ -74,6 +75,7 @@ plt.xlabel("День")
 plt.ylabel("Человек")
 plt.legend()
 
+plt.show()
 
 plt.figure()
 plt.plot(np.linspace(1, row_number, row_number), stats.iloc[:, 2], c='r', label="данные")
@@ -82,5 +84,22 @@ plt.title("Общее число смертей")
 plt.xlabel("День")
 plt.ylabel("Человек")
 plt.legend()
+
+plt.show()
+
+plt.figure()
+plt.plot(np.linspace(1, len(df1.iloc[:, 0]), len(df1.iloc[:, 0])), df1.iloc[:, 0], c='r')
+plt.plot(np.linspace(1, len(df2.iloc[:, 0]), len(df2.iloc[:, 0])), df2.iloc[:, 0], c='b')
+plt.plot(np.linspace(1, len(df3.iloc[:, 0]), len(df3.iloc[:, 0])), df3.iloc[:, 0], c='k')
+plt.plot(np.linspace(1, len(df4.iloc[:, 0]), len(df4.iloc[:, 0])), df4.iloc[:, 0], c='m')
+plt.plot(np.linspace(1, len(df5.iloc[:, 0]), len(df5.iloc[:, 0])), df5.iloc[:, 0])
+plt.plot(np.linspace(1, len(df1.iloc[:, 0]), len(df1.iloc[:, 0])), df6.iloc[:, 0])
+plt.plot(np.linspace(1, len(df1.iloc[:, 0]), len(df1.iloc[:, 0])), df7.iloc[:, 0])
+plt.plot(np.linspace(1, len(df1.iloc[:, 0]), len(df1.iloc[:, 0])), df8.iloc[:, 0])
+plt.plot(np.linspace(1, len(df1.iloc[:, 0]), len(df1.iloc[:, 0])), df9.iloc[:, 0])
+plt.plot(np.linspace(1, len(df1.iloc[:, 0]), len(df1.iloc[:, 0])), df10.iloc[:, 0])
+plt.title("Число новых случаев")
+plt.xlabel("День")
+plt.ylabel("Человек")
 
 plt.show()
